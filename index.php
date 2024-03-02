@@ -176,6 +176,48 @@
                         </div>
 
                                     <?php
+
+                                    $query_replies = mysqli_query($db,"SELECT * from scpel_forum_replies where FORUM_ID='".$fetch_one['ID']."' ");
+                                    while($fetch_replies = mysqli_fetch_assoc($query_replies)){
+                                        ?>
+
+<div class="border ml-10 border-4 mb-4 border-gray-500">
+                            <!-- Header Div -->
+                            <div class="h-10 flex justify-between w-full bg-gray-200">
+                                <p class="m-2">RE: <?php echo $fetch_replies['SUBJECT']; ?></p>
+                                <p class="m-2">5 hours ago</p>
+                            </div>
+    
+                            <!-- Inner Flex Container -->
+                            <div class="flex  w-full">
+                                <!-- First Inner Div (Narrower) -->
+                                <div class="p-4 w-60 bg-gray-100">
+                                    <div class="w-full">
+                                        <h1><?php echo $fetch_replies['USER_NAME']; ?></h1>
+                                        <div class=" ">
+                                            <img class="" src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ','+',$fetch_replies['USER_NAME']); ?>&background=random">
+                                        </div>
+                                    </div>
+    
+                                    <div class="mt-20">
+                                        <ul>
+                                            <li><a>Share Post</a></li>
+                                            <li><a href="./forum_reply.php?forum=<?php echo $fetch_replies['ID']; ?>">Reply to Post</a></li>
+                                            <li>Github Account</li>
+                                        </ul>
+                                    </div>
+                                </div>
+    
+                                <!-- Second Inner Div (Takes Remaining Space) -->
+                                <div class="w-full p-4 bg-white">
+                                    <p>
+                                        <?php echo $fetch_replies['MESSAGE']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                                        <?php
+                                    }
                                 }
                             
                             

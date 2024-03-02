@@ -228,7 +228,7 @@
                 <div  class="m-auto ml-4 h-screen custom-scrollbar pb-20 text-justify">
 
                     <!-- Editor -->
-                    <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="post" class="border border-4 border-gray-500 mb-4 p-4">
+                    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" class="border border-4 border-gray-500 mb-4 p-4">
                         <?php
                             if (isset($_POST['add_thread'])) {
 
@@ -258,6 +258,44 @@
                                         <?php
                                     }
                                 }
+                            }
+
+
+                            if (isset($_POST['reply_thread'])) {
+                                $name= $_POST['name'];
+                                $email= $_POST['email'];
+                                $message= $_POST['message'];
+                                $subject= $_POST['subject'];
+                            
+
+                                if (empty($name) || empty($email) || empty($message) || empty($subject)) {
+                                    ?>
+                                    <div class="p-4 w-full bg-red-400 text-white">Fields must not be empty</div>
+                                    <?php
+                                }
+                                else{
+                                    $query = mysqli_query($db,"INSERT INTO scpel_forum_replies (`USER_NAME`,`USER_EMAIL`,`SUBJECT`,`MESSAGE`,`FORUM_ID`) values('$name','$email','$subject','$message','".$_POST['reply_thread_id']."')  ");
+                                    if ($query) {
+                                        ?>
+                                        <div class="p-4 w-full bg-green-400 text-white">The forum has been created, thank you for your contribution</div>
+                                        <script> setInterval(()=>{location.replace("index.php"); },3000)</script>
+                                        <?php
+                                        
+                                    }
+                                    else{
+                                        ?>
+                                        <div class="p-4 w-full bg-red-400 text-white">Something gone wrong</div>
+                                        <?php
+                                    }
+                                }
+                            }
+                        ?>
+
+                        <?php 
+                            if (isset($_GET['forum'])) {
+                                ?>
+                                <input type="hidden" name="reply_thread_id" value="<?php echo $_GET['forum']; ?>">
+                                <?php
                             }
                         ?>
                         <div>
@@ -429,8 +467,22 @@
                                     <button type="button" onclick="review_message()"
                                         class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Save
                                         and Review</button>
-                                    <button name="add_thread" type="submit"
+                                    
+
+                                    <?php
+                                        if (isset($_GET['forum'])) {
+                                            ?>
+                                            <button name="reply_thread" type="submit"
+                                        class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Send Reply</button>
+                                            <?php
+                                        }
+                                        else{
+                                            ?>
+                                            <button name="add_thread" type="submit"
                                         class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-1 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Send</button>
+                                            <?php
+                                        }
+                                    ?>
                                     <input id="link-checkbox" type="checkbox" value=""
                                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                     <label for="link-checkbox"
