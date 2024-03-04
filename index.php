@@ -202,7 +202,7 @@
                                     <div class="mt-20">
                                         <ul>
                                             <li><a>Share Post</a></li>
-                                            <li><a href="./forum_reply.php?forum=<?php echo $fetch_replies['ID']; ?>">Reply to Post</a></li>
+                                    
                                             <li>Github Account</li>
                                         </ul>
                                     </div>
