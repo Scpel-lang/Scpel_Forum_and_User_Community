@@ -1,12 +1,13 @@
 <?php
+require_once __DIR__."../../../db/connections.php";
 
 function validate($data)
 {
-    require("connection.php");
+    global $db;
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
-    $data= mysqli_real_escape_string($connection,$data);
+    $data= mysqli_real_escape_string($db,$data);
     return $data;
 }
 

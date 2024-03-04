@@ -1,6 +1,6 @@
 <?php
 
-require_once "utils/header.php";
+require_once "../utils/header.php";
 
 $main_table = "scpel_forum";
 
