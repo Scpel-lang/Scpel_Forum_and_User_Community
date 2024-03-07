@@ -69,10 +69,15 @@ function all_threads(){
                 </div>
                 <div class="flex ">
                     <div class="bg-[#E5E7EB] min-h-[180px] w-[200px] justify-between text-sm p-2 flex flex-col">
-                        <div><?php echo $fetch['Name']; ?></div>
+                        <div>
+                            <div><?php echo $fetch['Name']; ?></div>
+                            <div>
+                                <img src="https://ui-avatars.com/api/?name=<?php echo $fetch['Name']; ?>&background=random" alt="" srcset="">
+                            </div>
+                        </div>
                         <div class="grid">
                             <a href="#">Share Post</a>
-                            <a href="#" class="hover:underline">Reply to Post</a>
+                            <a href="?thread=<?php echo $fetch['ThreadID']; ?>" class="hover:underline">Reply to Post</a>
                         </div>
                     </div>
                     <div class="flex-1 p-2 flex flex-col">
@@ -107,6 +112,9 @@ function get_thread_information($id){
                 <div class="flex ">
                     <div class="bg-[#E5E7EB] min-h-[180px] w-[200px] justify-between text-sm p-2 flex flex-col">
                         <div><?php echo $fetch_data['Name']; ?></div>
+                        <div>
+                            <img src="https://ui-avatars.com/api/?name=<?php echo $fetch_data['name']; ?>&background=random" alt="" srcset="">
+                        </div>
                         <div class="grid">
                             <a href="#">Share Post</a>
                             <a href="#" class="hover:underline">Reply to Post</a>
