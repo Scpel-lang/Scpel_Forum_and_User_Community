@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.3
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Mar 01, 2024 at 06:51 AM
--- Server version: 10.4.32-MariaDB-cll-lve
--- PHP Version: 7.4.30
+-- Host: localhost
+-- Generation Time: Mar 06, 2024 at 11:39 AM
+-- Server version: 8.0.36
+-- PHP Version: 8.3.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,104 +24,66 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `scpel_forum`
+-- Table structure for table `Scpel_Threads`
 --
 
-CREATE TABLE `scpel_forum` (
-  `ID` int(11) NOT NULL,
-  `SCPEL_USER_ID` int(11) DEFAULT NULL,
-  `USER_NAME` text DEFAULT NULL,
-  `USER_EMAIL` text DEFAULT NULL,
-  `SUBJECT` text NOT NULL,
-  `MESSAGE` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- Dumping data for table `scpel_forum`
---
-
-INSERT INTO `scpel_forum` (`ID`, `SCPEL_USER_ID`, `USER_NAME`, `USER_EMAIL`, `SUBJECT`, `MESSAGE`) VALUES
-(1, NULL, 'Fidele K', 'itfidele@gmail.com', 'Scpel', 'some text here '),
-(2, NULL, 'FRancis', 'phrunsys@scpel.org', 'Hello', '> some text here \r\n\r\nHow are you'),
-(3, NULL, 'Hrllo', 'phrunsys@cognospheredynamics.com', 'Hbbdddb', '> > some text here \r\n\r\nHow are youhdhdhd'),
-(4, NULL, 'PE', 'phrunsys@scpel.org', 'sdasda', 'adasdasd'),
-(5, NULL, 'Phrunsys Emmasson ', 'phrunsys@scpel.org', 'VPS5 Monthly plan canceled without refund!', 'asdasdasd');
+CREATE TABLE `Scpel_Threads` (
+  `ThreadID` int NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `Subject` varchar(255) NOT NULL,
+  `Message` text NOT NULL,
+  `UserID` int DEFAULT NULL,
+  `ParentThreadID` int DEFAULT NULL,
+  `Slug` varchar(255) NOT NULL,
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `scpel_forum_replies`
+-- Table structure for table `Scpel_Users`
 --
 
-CREATE TABLE `scpel_forum_replies` (
-  `ID` int(11) NOT NULL,
-  `FORUM_ID` int(11) DEFAULT NULL,
-  `SCPEL_USER_ID` int(11) DEFAULT NULL,
-  `USER_NAME` text DEFAULT NULL,
-  `USER_EMAIL` text DEFAULT NULL,
-  `SUBJECT` text NOT NULL,
-  `MESSAGE` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `scpel_users`
---
-
-CREATE TABLE `scpel_users` (
-  `ID` int(50) NOT NULL,
-  `NAME` varchar(50) NOT NULL,
-  `USERNAME` varchar(50) NOT NULL,
-  `EMAIL` text NOT NULL,
-  `PASSWORD` text NOT NULL,
-  `LAST_LOGIN` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+CREATE TABLE `Scpel_Users` (
+  `UserID` int NOT NULL,
+  `Username` varchar(255) NOT NULL,
+  `Password` varchar(255) NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `RegistrationDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `scpel_forum`
+-- Indexes for table `Scpel_Threads`
 --
-ALTER TABLE `scpel_forum`
-  ADD PRIMARY KEY (`ID`);
+ALTER TABLE `Scpel_Threads`
+  ADD PRIMARY KEY (`ThreadID`),
+  ADD UNIQUE KEY `Slug` (`Slug`),
+  ADD KEY `UserID` (`UserID`),
+  ADD KEY `ParentThreadID` (`ParentThreadID`);
 
 --
--- Indexes for table `scpel_forum_replies`
+-- Indexes for table `Scpel_Users`
 --
-ALTER TABLE `scpel_forum_replies`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `USER_NAME` (`USER_NAME`) USING HASH;
+ALTER TABLE `Scpel_Users`
+  ADD PRIMARY KEY (`UserID`);
 
 --
--- Indexes for table `scpel_users`
---
-ALTER TABLE `scpel_users`
-  ADD PRIMARY KEY (`ID`);
-
---
--- AUTO_INCREMENT for dumped tables
+-- Constraints for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `scpel_forum`
+-- Constraints for table `Scpel_Threads`
 --
-ALTER TABLE `scpel_forum`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `scpel_forum_replies`
---
-ALTER TABLE `scpel_forum_replies`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `scpel_users`
---
-ALTER TABLE `scpel_users`
-  MODIFY `ID` int(50) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `Scpel_Threads`
+  ADD CONSTRAINT `scpel_threads_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Scpel_Users` (`UserID`),
+  ADD CONSTRAINT `scpel_threads_ibfk_2` FOREIGN KEY (`ParentThreadID`) REFERENCES `Scpel_Threads` (`ThreadID`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

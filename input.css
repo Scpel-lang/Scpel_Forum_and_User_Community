@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body{
+    font-family: "Courier Prime", monospace;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+input{
+    @apply border-[1px] border-gray-300 px-2;
+}
+
+textarea{
+    @apply border-[1px] border-gray-300 p-1;
+}
+
+.form button{
+    @apply px-6 py-1 text-[16px] bg-gray-200 hover:bg-[#B723F7] hover:text-gray-100 transition-all duration-300;
+}
