@@ -116,7 +116,7 @@ function get_thread_information($id){
                     </div>
                     <div class="grid">
                         <a href="#">Share Post</a>
-                        <a href="reply.php" class="hover:underline">Reply to Post</a>
+                        <a href="reply.php?thread=<?php echo $fetch_main['ThreadID']; ?>" class="hover:underline">Reply to Post</a>
                     </div>
                 </div>
                 <div class="flex-1 p-2 flex flex-col">
@@ -125,7 +125,7 @@ function get_thread_information($id){
             </div>
         </div>
     </div>
-    <div hx-get="/forum/replies.php?thread=<?php echo $fetch_main['ThreadID']; ?>" hx-trigger="load">
+    <div hx-get="api/forum/replies.php?thread=<?php echo $fetch_main['ThreadID']; ?>" hx-trigger="load">
         <img  alt="Result loading..." class="htmx-indicator" width="50" src="/images/loading.gif"/>
     </div>
     <?php

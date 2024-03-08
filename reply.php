@@ -39,11 +39,17 @@
                 <div>
                     <div id="result" hx-target="#result" hx-swap="innerHTML" hx-trigger="revealed">
                     </div>
-                    <form hx-post="/api/forum" class="flex flex-col" hx-on::after-request=" if(event.detail.successful) this.reset()"  hx-post="/submit" hx-target="#result" hx-swap="innerHTML" method="post">
+                    <form hx-post="api/forum/replies.php" class="flex flex-col" hx-on::after-request=" if(event.detail.successful) this.reset()"  hx-target="#result" hx-swap="innerHTML" >
                         <span>Name</span>
                         <input type="text" name="name" id="">
                         <span>Email</span>
                         <input type="text" name="email"/>
+
+                        <input type="hidden" name="Re_thread" value="<?php 
+                            if (isset($_GET['thread'])) {
+                                echo $_GET['thread'];
+                            }
+                         ?>">
                         
                         <span>Subject</span>
                         <input type="text" name="subject" id="">
