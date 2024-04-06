@@ -1,3 +1,45 @@
+<?php
+// Include necessary PHP files for database connection and authentication
+include "./db/connections.php";
+
+// Function to fetch latest discussions
+function fetchLatestDiscussions($db) {
+    $query = mysqli_query($db, "SELECT * FROM scpel_forum ORDER BY ID DESC");
+    $discussions = [];
+    while ($fetch = mysqli_fetch_assoc($query)) {
+        $discussions[] = $fetch;
+    }
+    return $discussions;
+}
+
+// Function to fetch replies for a specific thread
+function fetchReplies($db, $threadID) {
+    $query = mysqli_query($db, "SELECT * FROM scpel_forum_replies WHERE FORUM_ID='$threadID'");
+    $replies = [];
+    while ($fetch = mysqli_fetch_assoc($query)) {
+        $replies[] = $fetch;
+    }
+    return $replies;
+}
+
+// Check if thread ID is provided in URL, then fetch thread and replies
+if (isset($_GET['thread'])) {
+    $threadID = $_GET['thread'];
+    $threadQuery = mysqli_query($db, "SELECT * FROM scpel_forum WHERE ID='$threadID'");
+    if ($threadQuery) {
+        $thread = mysqli_fetch_assoc($threadQuery);
+        $replies = fetchReplies($db, $threadID);
+    } else {
+        $error = "Error fetching thread: " . mysqli_error($db);
+    }
+}
+
+// Check for database connection errors
+if (!$db) {
+    $error = "Error connecting to the database: " . mysqli_connect_error();
+}
+
+?>
 <html>
     <head>
         <meta charset="UTF-8" />
@@ -235,3 +277,9 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     </body>
 </html>
+<?php
+// Display error message if there's an error
+if (isset($error)) {
+    echo "<p>Error: $error</p>";
+}
+?>
