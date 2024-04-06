@@ -7,59 +7,23 @@ $main_table = "scpel_threads";
 
 switch ($method) {
     case 'GET':
-        if (isset($_GET['thread']) && !empty($_GET['thread'])) {
-            return get_thread_replies(validate($_GET['thread']));
+        if (isset($_GET['thread'])) {
+            return get_thread_replies(validate($_POST['thread']));
         }
     
-    case 'POST':
-        if (isset($_POST['Re_thread']) && !empty($_POST['Re_thread'])) {
-            return create_thread_reply(validate($_POST['Re_thread']));
+    case 'GET':
+        if (isset($_POST['thread']) && !empty($_POST['thread'])) {
+            return create_thread_reply($thread);
         }
 
 }
 
 function create_thread_reply($thread){
-    global $main_table;
-    global $db;
 
-    if (isset($_POST['name']) and isset($_POST['subject']) and isset($_POST['message']) and isset($_POST['email'])) {
-        $name  = validate($_POST['name']);
-        $subject = validate($_POST['subject']);
-        $message = validate($_POST['message']);
-        $email = validate($_POST['email']);
-
-        if (!empty($name) and !empty($subject) and !empty($message) and !empty($email)) {
-            $sql = "INSERT INTO ".$main_table." (Name,Email,Subject,Message,ParentThreadID) VALUES('".$name."','".$email."','".$subject."','".$message."','".$thread."')";
-            $query = mysqli_query($db,$sql);
-            if ($query) {
-                ?>
-                <div class="bg-green-500 text-white px-4 py-2">Thank you for your contribution to the community
-                    <script>
-                        setTimeout(()=>{
-                            location.href = '/?thread=<?php echo $thread; ?>';
-                        },3000);
-                    </script>
-                </div>
-                <?php
-            }
-            else{
-                ?>
-                <div class="bg-red-500 text-white px-4 py-2">Something went wrong on our end please try again later</div>
-                <?php
-            }
-        }
-        else{
-            ?>
-            <div class="bg-red-500 text-white px-4 py-2">Fill all fields required to reply to this thread</div>
-            <?php
-        }
-    }
-    else{
-        ?>
-        <div class="bg-red-500 text-white px-4 py-2">Fill all fields required to reply to this thread</div>
-        <?php
-    }
-    
+    $name  = validate($_POST['name']);
+    $subject = validate($_POST['subject']);
+    $message = validate($_POST['message']);
+    $email = validate($_POST['email']);
 
 }
 
@@ -69,27 +33,25 @@ function get_thread_replies($thread){
     global $db;
     global $main_table;
 
-    $sql_children = "SELECT * FROM ".$main_table." WHERE ParentThreadID = '".$thread."' ";
+    $sql_children = "SELECT * FROM '".$main_table."' WHERE ParentThreadID = '".$thread."' ";
     $query_childrens = mysqli_query($db,$sql_children);
     while ($fetch_data = mysqli_fetch_assoc($query_childrens)) {
         ?>
         <div>
             <div class="flex flex-col my-2 bg-gray-50 gap-2 p-2 shadow-sm">
                 <div class="flex px-2 bg-gray-300">
-                    <a href="/?thread=<?php echo $fetch_data['ThreadID']; ?>" class="flex-1 hover:underline flex font-bold">RE: #<?php echo $fetch_data['ThreadID']." ".$fetch_data['Subject']; ?></a>
+                    <a href="" class="flex-1 hover:underline flex font-bold">#<?php echo $fetch_data['ThreadID']." ".$fetch_data['Subject']; ?></a>
                     <div class="flex"><?php echo get_time_elapsed_string($fetch_data['createdAt'],false); ?></div>
                 </div>
                 <div class="flex ">
                     <div class="bg-[#E5E7EB] min-h-[180px] w-[200px] justify-between text-sm p-2 flex flex-col">
+                        <div><?php echo $fetch_data['Name']; ?></div>
                         <div>
-                            <div><?php echo $fetch_data['Name']; ?></div>
-                            <div>
-                                <img src="https://ui-avatars.com/api/?name=<?php echo $fetch_data['Name']; ?>&background=random" alt="" srcset="">
-                            </div>
+                            <img src="https://ui-avatars.com/api/?name=<?php echo $fetch_data['name']; ?>&background=random" alt="" srcset="">
                         </div>
                         <div class="grid">
                             <a href="#">Share Post</a>
-                            <a href="reply.php?thread=<?php echo $fetch_data['ThreadID']; ?>" class="hover:underline">Reply to Post</a>
+                            <a href="#" class="hover:underline">Reply to Post</a>
                         </div>
                     </div>
                     <div class="flex-1 p-2 flex flex-col">
