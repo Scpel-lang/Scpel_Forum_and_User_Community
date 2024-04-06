@@ -2,11 +2,11 @@
 
 require_once "../utils/header.php";
 
-$main_table = "scpel_threads";
+$main_table = "scpel_forum_replies";
 
 switch ($method) {
     case 'GET':
-        if (!isset($_GET['ThreadID']) or empty($_GET['ThreadID'])) {
+        if (!isset($_GET['ID']) or empty($_GET['ID'])) {
             http_response_code(400);
             $response = json_encode(array(
                 "error" => 400,
