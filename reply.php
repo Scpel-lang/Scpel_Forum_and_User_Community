@@ -8,7 +8,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="styles/main.css" />    
-        <script src="styles/js/htmx.js"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     </head>
     
     <body class="h-screen">
