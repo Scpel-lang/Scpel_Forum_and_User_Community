@@ -1,6 +1,5 @@
 <div align="center">
-	<h1 style="color:#660991;">Subconscious Electronic Programming Language (Scpel)</h1>
-	<img src="https://scpel.org/scpel_logo.png"  width="300" height="200">
+	<img src="https://scpel.org/scpel_logo.png"  width="300" height="300">
 </div>
 
 <h2>Community and User Forum</h2>
