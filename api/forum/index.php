@@ -6,8 +6,8 @@ $main_table = "Scpel_Threads";
 
 switch ($method) {
     case 'GET':
-        if (isset($_GET['thread']) and !empty($_GET['thread'])) {
-            return get_thread_information(validate($_GET['thread']));
+        if (isset($_POST['thread'])) {
+            return get_thread_information(validate($_POST['thread']));
         }
         return all_threads();
 
@@ -64,7 +64,7 @@ function all_threads(){
             ?>
             <div class="flex flex-col my-2 bg-gray-50 gap-2 p-2 shadow-sm">
                 <div class="flex px-2 bg-gray-300">
-                    <a href="?thread=<?php echo $fetch['ThreadID']; ?>" class="flex-1 hover:underline flex font-bold">#<?php echo $fetch['ThreadID']." ".$fetch['Subject']; ?></a>
+                    <a href="" class="flex-1 hover:underline flex font-bold">#<?php echo $fetch['ThreadID']." ".$fetch['Subject']; ?></a>
                     <div class="flex"><?php echo get_time_elapsed_string($fetch['createdAt'],false); ?></div>
                 </div>
                 <div class="flex ">
@@ -99,36 +99,34 @@ function get_thread_information($id){
     $query = mysqli_query($db,$sql);
     $fetch_main = mysqli_fetch_assoc($query);
 
-    ?>
-    <div>
-        <div class="flex flex-col my-2 bg-gray-50 gap-2 p-2 shadow-sm">
-            <div class="flex px-2 bg-gray-300">
-                <a href="" class="flex-1 hover:underline flex font-bold">#<?php echo $fetch_main['ThreadID']." ".$fetch_main['Subject']; ?></a>
-                <div class="flex"><?php echo get_time_elapsed_string($fetch_main['createdAt'],false); ?></div>
-            </div>
-            <div class="flex ">
-                <div class="bg-[#E5E7EB] min-h-[180px] w-[200px] justify-between text-sm p-2 flex flex-col">
-                    <div>
-                        <div><?php echo $fetch_main['Name']; ?></div>
+    $sql_children = "SELECT * FROM '".$main_table."' WHERE ParentThreadID = '".$fetch_main['ThreadID']."' ";
+    $query_childrens = mysqli_query($db,$sql_children);
+    while ($fetch_data = mysqli_fetch_assoc($query_childrens)) {
+        ?>
+        <div>
+            <div class="flex flex-col my-2 bg-gray-50 gap-2 p-2 shadow-sm">
+                <div class="flex px-2 bg-gray-300">
+                    <a href="" class="flex-1 hover:underline flex font-bold">#<?php echo $fetch_data['ThreadID']." ".$fetch_data['Subject']; ?></a>
+                    <div class="flex"><?php echo get_time_elapsed_string($fetch_data['createdAt'],false); ?></div>
+                </div>
+                <div class="flex ">
+                    <div class="bg-[#E5E7EB] min-h-[180px] w-[200px] justify-between text-sm p-2 flex flex-col">
+                        <div><?php echo $fetch_data['Name']; ?></div>
                         <div>
-                            <img src="https://ui-avatars.com/api/?name=<?php echo $fetch_main['Name']; ?>&background=random" alt="" srcset="">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo $fetch_data['name']; ?>&background=random" alt="" srcset="">
+                        </div>
+                        <div class="grid">
+                            <a href="#">Share Post</a>
+                            <a href="#" class="hover:underline">Reply to Post</a>
                         </div>
                     </div>
-                    <div class="grid">
-                        <a href="#">Share Post</a>
-                        <a href="reply.php" class="hover:underline">Reply to Post</a>
+                    <div class="flex-1 p-2 flex flex-col">
+                        <?php echo $fetch_data['Message'] ?>
                     </div>
-                </div>
-                <div class="flex-1 p-2 flex flex-col">
-                    <?php echo $fetch_main['Message'] ?>
                 </div>
             </div>
         </div>
-    </div>
-    <div hx-get="/forum/replies.php?thread=<?php echo $fetch_main['ThreadID']; ?>" hx-trigger="load">
-        <img  alt="Result loading..." class="htmx-indicator" width="50" src="/images/loading.gif"/>
-    </div>
-    <?php
+        <?php
+    }
 }
-
 ?>

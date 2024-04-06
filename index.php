@@ -41,9 +41,7 @@
                     </div>
                 </div>
 
-                <div hx-get="/api/forum?thread=<?php if (isset($_GET['thread'])) {
-                    echo $_GET['thread'];
-                } ?>" hx-trigger="load">
+                <div hx-get="/api/forum" hx-trigger="load">
                     <img  alt="Result loading..." class="htmx-indicator" width="50" src="/images/loading.gif"/>
                 </div>
 
