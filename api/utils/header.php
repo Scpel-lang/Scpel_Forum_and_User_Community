@@ -1,6 +1,6 @@
 <?php
 require_once  __DIR__ ."../../../db/connections.php";
-require_once __DIR__."../../utils/validate.php";
+
 
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");		// CORS

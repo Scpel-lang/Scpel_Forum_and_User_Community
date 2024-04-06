@@ -230,9 +230,8 @@
             </div>
         </section>
     
-        <?php require_once "inc/scripts.php" ?>
-        <script src="styles/js/forum.js"></script>
-                                
+    
+    
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     </body>
 </html>
