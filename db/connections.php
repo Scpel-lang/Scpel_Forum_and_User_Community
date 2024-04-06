@@ -1,7 +1,15 @@
-<?php 
-    // $db = mysqli_connect('localhost','phrunsys_scpel_community','1s2c3p4e5l','phrunsys_scpel_community')or  die ('Database connection failed');
+<?php
+// Define database connection constants
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', 'admin@123');
+define('DB_NAME', 'phrunsys_scpel_community');
 
+// Create connection
+$conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
-   $db = mysqli_connect('localhost','root','admin@123','phrunsys_scpel_community')or  die ('Database connection failed');
-
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 ?>
