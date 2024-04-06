@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php if (isset($error)): ?>
                 <p class="text-red-500 mb-4"><?php echo $error; ?></p>
             <?php endif; ?>
-            <form method="post">
+            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
                 <div class="mb-4">
                     <label for="username" class="block text-gray-700">Username</label>
                     <input type="text" id="username" name="username" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
