@@ -16,7 +16,7 @@ if (isset($_GET['post_id'])) {
     $stmt->bind_param("i", $post_id);
     $stmt->execute();
 
-    // Redirect back to the forum or a confirmation page
+    // Redirect back to the forum
     header("Location: index.php");
 } else {
     // Handle the case where no post ID is provided
