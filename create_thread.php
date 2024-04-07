@@ -1,114 +1,87 @@
 <?php
 session_start();
 
-// Include necessary PHP files for database connection and authentication
-include "./db/connections.php";
+// Include database connection
+include_once "./db_connection.php";
 
-// Check if user is logged in
+// Initialize variables
+$error = "";
+
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: login.php"); // Redirect to login page if not logged in
+    header("Location: login.php");
     exit();
 }
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate and sanitize input
-    $subject = trim($_POST['subject'] ?? '');
-    $message = trim($_POST['message'] ?? '');
+    // Get form data
+    $userName = $_SESSION['username'];
+    $subject = $_POST['subject'];
+    $message = $_POST['message'];
 
-    // Perform validation
-    $errors = [];
-    if (empty($subject)) {
-        $errors[] = "Subject is required.";
-    }
-    if (empty($message)) {
-        $errors[] = "Message is required.";
-    }
-
-    // If no errors, insert into database
-    if (empty($errors)) {
-        $username = mysqli_real_escape_string($db, $_SESSION['username']);
-        $subject = mysqli_real_escape_string($db, $subject);
-        $message = mysqli_real_escape_string($db, $message);
-
-        $query = "INSERT INTO scpel_forum (USER_NAME, SUBJECT, MESSAGE) VALUES ('$username', '$subject', '$message')";
-        $result = mysqli_query($db, $query);
-        if ($result) {
-            // Redirect to the newly created thread
-            $threadID = mysqli_insert_id($db);
-            header("Location: index.php?thread=$threadID");
+    // Validate input
+    if (empty($subject) || empty($message)) {
+        $error = "Please fill in all fields.";
+    } else {
+        // Insert thread into database
+        $stmt = $conn->prepare("INSERT INTO scpel_forum (USER_NAME, SUBJECT, MESSAGE) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $userName, $subject, $message);
+        if ($stmt->execute()) {
+            // Redirect to index.php after successful insertion
+            header("Location: index.php");
             exit();
         } else {
-            $error = "Error creating thread: " . mysqli_error($db);
+            $error = "Error inserting thread. Please try again later.";
         }
     }
 }
-
-// Check for database connection errors
-if (!$db) {
-    $error = "Error connecting to the database: " . mysqli_connect_error();
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Thread - Scpel Forum</title>
+    <title>Create Thread - A Systems reflective meta-programming language for AI</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../docs/styles.css">
+    <link rel="stylesheet" href="./sheety.css">
 </head>
-<body class="bg-gray-100">
+<body class="h-screen">
 
-<nav class="bg-white border-gray-200 dark:bg-gray-900">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Scpel</span>
-        </a>
-        <div class="hidden w-full md:block md:w-auto" id="navbar-default">
-            <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                <li><a href="#" class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</a></li>
-                <li><a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About</a></li>
-                <li><a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Services</a></li>
-                <li><a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Pricing</a></li>
-                <li><a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact</a></li>
-                <li>
-                    <form method="post">
-                        <button type="submit" name="logout" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Logout</button>
-                    </form>
-                </li>
-            </ul>
+<!-- Navigation Bar -->
+<?php include_once "navbar.php"; ?>
+
+<section class="max-w-screen-xl items-center h-[100vh] justify-between mx-auto">
+    <div class="flex">
+        <!-- Side Panel (left div) -->
+        <?php include_once "sidepanel.php"; ?>
+
+        <!-- Main Content (right div) -->
+        <div class="flex-1 h-full items-center justify-center relative">
+            <div class="m-auto ml-4 h-screen pb-20 text-justify">
+                <h2 class="text-2xl font-semibold mb-6">Create New Thread</h2>
+                <?php if (!empty($error)) : ?>
+                    <p class="text-red-500 mb-4"><?php echo $error; ?></p>
+                <?php endif; ?>
+                <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+                    <div class="mb-4">
+                        <label for="subject" class="block text-gray-700">Subject</label>
+                        <input type="text" id="subject" name="subject" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    </div>
+                    <div class="mb-4">
+                        <label for="message" class="block text-gray-700">Message</label>
+                        <textarea id="message" name="message" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Create Thread</button>
+                </form>
+            </div>
         </div>
     </div>
-</nav>
+</section>
 
-<div class="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg font-semibold leading-6 text-gray-900">Create a New Thread</h3>
-        </div>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" class="px-4 py-5 bg-white sm:p-6">
-            <?php if (isset($error)) : ?>
-                <p class="text-red-500"><?php echo $error; ?></p>
-            <?php endif; ?>
-            <?php foreach ($errors as $error) : ?>
-                <p class="text-red-500"><?php echo $error; ?></p>
-            <?php endforeach; ?>
-            <div class="mb-4">
-                <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
-                <input type="text" name="subject" id="subject" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required value="<?php echo isset($_POST['subject']) ? htmlspecialchars($_POST['subject']) : ''; ?>">
-            </div>
-            <div class="mb-4">
-                <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
-                <textarea id="message" name="message" rows="5" class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" required><?php echo isset($_POST['message']) ? htmlspecialchars($_POST['message']) : ''; ?></textarea>
-            </div>
-            <div class="flex justify-end">
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    Create Thread
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 </body>
 </html>
