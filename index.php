@@ -1,38 +1,54 @@
 <?php
 session_start();
 
-// Include necessary PHP files for database connection and authentication
-include "./db/connections.php";
+// Include database connection
+include_once "./db_connection.php";
 
-// Check if user is logged in
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: login.php"); // Redirect to login page if not logged in
+    header("Location: login.php");
     exit();
 }
 
 // Logout functionality
 if (isset($_POST['logout'])) {
     session_destroy(); // Destroy session data
-    header("Location: login.php"); // Redirect to login page after logout
+    header("Location: login.php");
     exit();
 }
 
+// Initialize error variable
+$error = "";
+
 // Function to fetch latest discussions
 function fetchLatestDiscussions($db) {
-    $query = mysqli_query($db, "SELECT * FROM scpel_forum ORDER BY ID DESC");
     $discussions = [];
-    while ($fetch = mysqli_fetch_assoc($query)) {
-        $discussions[] = $fetch;
+    $query = "SELECT * FROM scpel_forum ORDER BY ID DESC";
+    $result = mysqli_query($db, $query);
+    if ($result) {
+        while ($fetch = mysqli_fetch_assoc($result)) {
+            $discussions[] = $fetch;
+        }
+    } else {
+        $error = "Error fetching discussions: " . mysqli_error($db);
     }
     return $discussions;
 }
 
 // Function to fetch replies for a specific thread
 function fetchReplies($db, $threadID) {
-    $query = mysqli_query($db, "SELECT * FROM scpel_forum_replies WHERE FORUM_ID='$threadID'");
     $replies = [];
-    while ($fetch = mysqli_fetch_assoc($query)) {
-        $replies[] = $fetch;
+    $query = "SELECT * FROM scpel_forum_replies WHERE FORUM_ID=?";
+    $stmt = mysqli_prepare($db, $query);
+    mysqli_stmt_bind_param($stmt, "i", $threadID);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if ($result) {
+        while ($fetch = mysqli_fetch_assoc($result)) {
+            $replies[] = $fetch;
+        }
+    } else {
+        $error = "Error fetching replies: " . mysqli_error($db);
     }
     return $replies;
 }
@@ -49,11 +65,6 @@ if (isset($_GET['thread'])) {
     }
 }
 
-// Check for database connection errors
-if (!$db) {
-    $error = "Error connecting to the database: " . mysqli_connect_error();
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,124 +79,29 @@ if (!$db) {
 </head>
 <body class="h-screen">
 
-<nav class="bg-white border-gray-200 dark:bg-gray-900">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Scpel</span>
-        </a>
-        <div class="hidden w-full md:block md:w-auto" id="navbar-default">
-            <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                <li><a href="#" class="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</a></li>
-                <li><a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">About</a></li>
-                <li><a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Services</a></li>
-                <li><a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Pricing</a></li>
-                <li><a href="#" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Contact</a></li>
-                <li>
-                    <form method="post">
-                        <button type="submit" name="logout" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Logout</button>
-                    </form>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<!-- Navigation Bar -->
+<?php include_once "navbar.php"; ?>
 
+<!-- Main Content -->
 <section class="max-w-screen-xl items-center h-[100vh] justify-between mx-auto">
     <div class="flex">
         <!-- Side Panel (left div) -->
-        <div class="w-1/5 flex flex-col p-2">
-            <div class="w-full h-80">
-                <div class="flex items-center justify-between mb-4">
-                    <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Latest Discussions</h5>
-                </div>
-                <div class="flow-root">
-                    <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                        <?php foreach(fetchLatestDiscussions($db) as $discussion): ?>
-                            <li class="py-1 hover:bg-gray-100 cursor-pointer">
-                                <a href="?thread=<?php echo $discussion['ID']; ?>" class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full" src="https://ui-avatars.com/api/?name=<?php echo urlencode($discussion['USER_NAME']); ?>&background=random" alt="User Image">
-                                    </div>
-                                    <div class="flex-1 min-w-0 ms-4">
-                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white"><?php echo $discussion['SUBJECT']; ?></p>
-                                        <div class="mt-2 flex justify-between w-full pl-2 pr-2">
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">by <?php echo $discussion['USER_NAME']; ?></p>
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">1 day ago</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <?php include_once "sidepanel.php"; ?>
 
         <!-- Main Content (right div) -->
         <div class="flex-1 h-full items-center justify-center relative">
             <a href="create_thread.php" class="text-blue-400 hover:underline">Create a thread</a>
             <div class="m-auto ml-4 h-screen pb-20 text-justify">
                 <?php if(isset($_GET['thread'])): ?>
-                    <div class="border border-4 mb-4 border-gray-500">
-                        <div class="h-10 flex justify-between w-full bg-gray-200">
-                            <p class="m-2"><?php echo $thread['SUBJECT']; ?></p>
-                            <p class="m-2">5 hours ago</p>
-                        </div>
-                        <div class="flex  w-full">
-                            <div class="p-4 w-60 bg-gray-100">
-                                <div class="w-full">
-                                    <h1><?php echo $thread['USER_NAME']; ?></h1>
-                                    <div class="">
-                                        <img class="" src="https://ui-avatars.com/api/?name=<?php echo urlencode($thread['USER_NAME']); ?>&background=random">
-                                    </div>
-                                </div>
-                                <div class="mt-20">
-                                    <ul>
-                                        <li><a>Share Post</a></li>
-                                        <li><a href="./forum_reply.php?forum=<?php echo $thread['ID']; ?>">Reply to Post</a></li>
-                                        <li>Github Account</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="w-full p-4 bg-white">
-                                <p><?php echo $thread['MESSAGE']; ?></p>
-                            </div>
-                        </div>
-                    </div>
-                    <?php foreach($replies as $reply): ?>
-                        <div class="border ml-10 border-4 mb-4 border-gray-500">
-                            <div class="h-10 flex justify-between w-full bg-gray-200">
-                                <p class="m-2">RE: <?php echo $reply['SUBJECT']; ?></p>
-                                <p class="m-2">5 hours ago</p>
-                            </div>
-                            <div class="flex  w-full">
-                                <div class="p-4 w-60 bg-gray-100">
-                                    <div class="w-full">
-                                        <h1><?php echo $reply['USER_NAME']; ?></h1>
-                                        <div class="">
-                                            <img class="" src="https://ui-avatars.com/api/?name=<?php echo urlencode($reply['USER_NAME']); ?>&background=random">
-                                        </div>
-                                    </div>
-                                    <div class="mt-20">
-                                        <ul>
-                                            <li><a>Share Post</a></li>
-                                            <li><a href="./forum_reply.php?forum=<?php echo $reply['ID']; ?>">Reply to Post</a></li>
-                                            <li>Github Account</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="w-full p-4 bg-white">
-                                    <p><?php echo $reply['MESSAGE']; ?></p>
-                                </div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                    <!-- Display Thread and Replies -->
+                    <?php include_once "thread_display.php"; ?>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 </section>
 
+<!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 </body>
 </html>
