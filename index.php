@@ -161,6 +161,10 @@
                                         <ul>
                                             <li><a>Share Post</a></li>
                                             <li><a href="./forum_reply.php?forum=<?php echo $fetch_one['ID']; ?>">Reply to Post</a></li>
+
+                                            <li><a href="./delete_post.php?post_id=<?php echo $fetch_one['ID']; ?>" class="text-red-500">Delete Post</a></li>
+                                          
+
                                             <li>Github Account</li>
                                         </ul>
                                     </div>
