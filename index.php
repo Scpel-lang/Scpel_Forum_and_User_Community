@@ -1,6 +1,6 @@
 <?php
 // Include database configuration file
-require_once "./db/config.php";
+require_once "./db/connections.php";
 
 // Function to sanitize input data
 function sanitizeInput($input) {
@@ -105,19 +105,6 @@ if (!$query) {
         </div>
     </nav>
 
-    <div class="latest-discussions">
-        <h2>Latest Discussions</h2>
-        <ul>
-            <?php while ($row = $query->fetch_assoc()): ?>
-                <li>
-                    <a href="view_discussion.php?id=<?php echo $row['ID']; ?>">
-                        <?php echo htmlspecialchars($row['SUBJECT']); ?>
-                    </a>
-                </li>
-            <?php endwhile; ?>
-        </ul>
-    </div>
-
     <!-- Pagination links -->
     <div class="pagination">
         <?php
@@ -200,6 +187,7 @@ if (!$query) {
                         <!-- Outer Container with Border -->                 
 
                         <?php 
+
                                     if(isset($_GET['thread'])){
                                     
                             $query2 = mysqli_query($db,"SELECT * from scpel_forum where ID='".$_GET['thread']."' ");
@@ -298,8 +286,7 @@ if (!$query) {
                 </div>
             </div>
         </section>
-   
     
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
-    </body>
+</body>
 </html>
