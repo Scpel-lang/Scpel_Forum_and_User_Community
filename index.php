@@ -1,3 +1,21 @@
+<?php
+include "./db/connections.php";
+
+// Error handling for database connection
+if ($db->connect_errno) {
+    echo "Failed to connect to MySQL: " . $db->connect_error;
+    exit();
+}
+
+// Fetch discussions from the database
+$query = $db->query("SELECT * FROM scpel_forum ORDER BY ID DESC");
+
+// Error handling for database query
+if (!$query) {
+    echo "Error: " . $db->error;
+    exit();
+}
+?>
 <html>
     <head>
         <meta charset="UTF-8" />
@@ -59,7 +77,19 @@
                 </div>
             </div>
         </nav>
-    
+
+        <div class="latest-discussions">
+            <h2>Latest Discussions</h2>
+            <ul>
+                <?php while ($row = $query->fetch_assoc()): ?>
+                    <li>
+                        <a href="view_discussion.php?id=<?php echo $row['ID']; ?>">
+                            <?php echo $row['SUBJECT']; ?>
+                        </a>
+                    </li>
+                <?php endwhile; ?>
+            </ul>
+        </div>
     
         <section class="max-w-screen-xl items-center h-[100vh] justify-between mx-auto">
             <div class="flex">
