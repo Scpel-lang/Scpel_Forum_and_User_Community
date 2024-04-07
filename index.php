@@ -2,11 +2,45 @@
 // Include database configuration file
 include_once "./db/connections.php";
 
+// Function to sanitize input data
+function sanitizeInput($input) {
+    // Remove leading and trailing whitespaces
+    $input = trim($input);
+    // Remove HTML and PHP tags
+    $input = strip_tags($input);
+    // Escape special characters to prevent SQL injection
+    $input = mysqli_real_escape_string($db, $input);
+    return $input;
+}
+
+// Function to validate page number
+function validatePageNumber($page) {
+    // Ensure page number is numeric and greater than zero
+    if (is_numeric($page) && $page > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Function to validate discussion ID
+function validateDiscussionID($id) {
+    // Ensure discussion ID is numeric and greater than zero
+    if (is_numeric($id) && $id > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // Pagination configuration
 $results_per_page = 10; // Number of discussions per page
 
-// Get current page number from URL, or set it to 1 if not provided
-$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+// Get current page number from URL, or set it to 1 if not provided or invalid
+$current_page = isset($_GET['page']) ? sanitizeInput($_GET['page']) : 1;
+if (!validatePageNumber($current_page)) {
+    $current_page = 1;
+}
 
 // Calculate the SQL LIMIT starting point for the current page
 $start_from = ($current_page - 1) * $results_per_page;
@@ -84,7 +118,7 @@ if (!$query) {
         <?php while ($row = $query->fetch_assoc()): ?>
             <li>
                 <a href="view_discussion.php?id=<?php echo $row['ID']; ?>">
-                    <?php echo $row['SUBJECT']; ?>
+                    <?php echo htmlspecialchars($row['SUBJECT']); ?>
                 </a>
             </li>
         <?php endwhile; ?>
@@ -101,7 +135,7 @@ if (!$query) {
 
     // Display pagination links
     for ($i = 1; $i <= $total_pages; $i++) {
-        echo "<a href='?page=$i'>$i</a> ";
+        echo "<a href='?page=$i'>" . htmlspecialchars($i) . "</a> ";
     }
     ?>
 </div>
@@ -126,17 +160,17 @@ if (!$query) {
                                      class="flex items-center">
                                     <div class="flex-shrink-0">
                                         <img class="w-8 h-8 rounded-full"
-                                             src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', $fetch['USER_NAME']); ?>&background=random"
+                                             src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', htmlspecialchars($fetch['USER_NAME'])); ?>&background=random"
                                              alt="Avatar">
                                     </div>
                                     <div class="flex-1 min-w-0 ms-4">
                                         <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                            <?php echo $fetch['SUBJECT']; ?>
+                                            <?php echo htmlspecialchars($fetch['SUBJECT']); ?>
                                         </p>
 
                                         <div class="mt-2 flex justify-between w-full pl-2 pr-2">
                                             <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                by <?php echo $fetch['USER_NAME']; ?>
+                                                by <?php echo htmlspecialchars($fetch['USER_NAME']); ?>
                                             </p>
                                             <p class="text-sm text-gray-500 truncate dark:text-gray-400">
                                                 1 day ago
@@ -161,14 +195,15 @@ if (!$query) {
             <div class="m-auto ml-4 h-screen pb-20 text-justify">
                 <!-- Display individual discussion and its replies -->
                 <?php
-                if (isset($_GET['thread'])) {
-                    $query2 = mysqli_query($db, "SELECT * from scpel_forum where ID='" . $_GET['thread'] . "' ");
+                if (isset($_GET['thread']) && validateDiscussionID($_GET['thread'])) {
+                    $thread_id = sanitizeInput($_GET['thread']);
+                    $query2 = mysqli_query($db, "SELECT * from scpel_forum where ID='$thread_id'");
                     $fetch_one = mysqli_fetch_assoc($query2);
                     ?>
                     <div class="border border-4 mb-4 border-gray-500">
                         <!-- Header Div -->
                         <div class="h-10 flex justify-between w-full bg-gray-200">
-                            <p class="m-2"><?php echo $fetch_one['SUBJECT']; ?></p>
+                            <p class="m-2"><?php echo htmlspecialchars($fetch_one['SUBJECT']); ?></p>
                             <p class="m-2">5 hours ago</p>
                         </div>
 
@@ -177,10 +212,10 @@ if (!$query) {
                             <!-- First Inner Div (Narrower) -->
                             <div class="p-4 w-60 bg-gray-100">
                                 <div class="w-full">
-                                    <h1><?php echo $fetch_one['USER_NAME']; ?></h1>
+                                    <h1><?php echo htmlspecialchars($fetch_one['USER_NAME']); ?></h1>
                                     <div class=" ">
                                         <img class=""
-                                             src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', $fetch_one['USER_NAME']); ?>&background=random"
+                                             src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', htmlspecialchars($fetch_one['USER_NAME'])); ?>&background=random"
                                              alt="Avatar">
                                     </div>
                                 </div>
@@ -198,7 +233,7 @@ if (!$query) {
                             <!-- Second Inner Div (Takes Remaining Space) -->
                             <div class="w-full p-4 bg-white">
                                 <p>
-                                    <?php echo $fetch_one['MESSAGE']; ?>
+                                    <?php echo htmlspecialchars($fetch_one['MESSAGE']); ?>
                                 </p>
                             </div>
                         </div>
@@ -206,13 +241,13 @@ if (!$query) {
                     <?php
 
                     // Fetch replies for the selected discussion
-                    $query_replies = mysqli_query($db, "SELECT * from scpel_forum_replies where FORUM_ID='" . $fetch_one['ID'] . "' ");
+                    $query_replies = mysqli_query($db, "SELECT * from scpel_forum_replies where FORUM_ID='$thread_id'");
                     while ($fetch_replies = mysqli_fetch_assoc($query_replies)) {
                         ?>
                         <div class="border ml-10 border-4 mb-4 border-gray-500">
                             <!-- Header Div -->
                             <div class="h-10 flex justify-between w-full bg-gray-200">
-                                <p class="m-2">RE: <?php echo $fetch_replies['SUBJECT']; ?></p>
+                                <p class="m-2">RE: <?php echo htmlspecialchars($fetch_replies['SUBJECT']); ?></p>
                                 <p class="m-2">5 hours ago</p>
                             </div>
 
@@ -221,10 +256,10 @@ if (!$query) {
                                 <!-- First Inner Div (Narrower) -->
                                 <div class="p-4 w-60 bg-gray-100">
                                     <div class="w-full">
-                                        <h1><?php echo $fetch_replies['USER_NAME']; ?></h1>
+                                        <h1><?php echo htmlspecialchars($fetch_replies['USER_NAME']); ?></h1>
                                         <div class=" ">
                                             <img class=""
-                                                 src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', $fetch_replies['USER_NAME']); ?>&background=random"
+                                                 src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', htmlspecialchars($fetch_replies['USER_NAME'])); ?>&background=random"
                                                  alt="Avatar">
                                         </div>
                                     </div>
@@ -243,7 +278,7 @@ if (!$query) {
                                 <!-- Second Inner Div (Takes Remaining Space) -->
                                 <div class="w-full p-4 bg-white">
                                     <p>
-                                        <?php echo $fetch_replies['MESSAGE']; ?>
+                                        <?php echo htmlspecialchars($fetch_replies['MESSAGE']); ?>
                                     </p>
                                 </div>
                             </div>
