@@ -218,6 +218,10 @@ if (!$query) {
                                         <ul>
                                             <li><a>Share Post</a></li>
                                             <li><a href="./forum_reply.php?forum=<?php echo $fetch_one['ID']; ?>">Reply to Post</a></li>
+                                            <li><a href="./edit_post.php?post_id=<?php echo $fetch_one['ID']; ?>" class="text-blue-500">Edit Post</a></li>
+                                            <li><a href="./delete_post.php?post_id=<?php echo $fetch_one['ID']; ?>" class="text-red-500">Delete Post</a></li>
+                                          
+
                                             <li>Github Account</li>
                                         </ul>
                                     </div>
@@ -260,6 +264,12 @@ if (!$query) {
                                         <ul>
                                             <li><a>Share Post</a></li>
                                             <li><a href="./forum_reply.php?forum=<?php echo $fetch_replies['ID']; ?>">Reply to Post</a></li>
+                                            <li><a href="./edit_reply.php?reply_id=<?php echo $fetch_replies['ID']; ?>" class="text-blue-500">Edit Reply</a></li>
+                                           
+
+                                            <li><a href="./delete_reply.php?reply_id=<?php echo $fetch_replies['ID']; ?>" class="text-red-500">Delete Reply</a></li>
+                                         
+
                                             <li>Github Account</li>
                                         </ul>
                                     </div>
