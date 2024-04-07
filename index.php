@@ -1,18 +1,20 @@
 <?php
 // Include database configuration file
-require_once "./db/connections.php";
+require_once "./classes/forum.php";
+require_once "./classes/forum_reply.php";
 
-// Function to sanitize input data
+$errors = [];
+
 function sanitizeInput($input) {
-    // Remove leading and trailing whitespaces
+    // Remove whitespace from beginning and end of string
     $input = trim($input);
-    // Remove HTML and PHP tags
-    $input = strip_tags($input);
-    // Escape special characters to prevent SQL injection
-    global $db;
-    $input = mysqli_real_escape_string($db, $input);
+    // Remove backslashes
+    $input = stripslashes($input);
+    // Convert special characters to HTML entities
+    $input = htmlspecialchars($input);
     return $input;
 }
+
 
 // Function to validate page number
 function validatePageNumber($page) {
@@ -38,14 +40,11 @@ if (!validatePageNumber($current_page)) {
 // Calculate the SQL LIMIT starting point for the current page
 $start_from = ($current_page - 1) * $results_per_page;
 
-// Fetch discussions from the database with pagination
-$query = $db->query("SELECT * FROM scpel_forum ORDER BY ID DESC LIMIT $start_from, $results_per_page");
+// Fetch discussions for the current page
+$forum = new Forum($conn);
+$forum_stmt = $forum->paginate($start_from, $results_per_page);
+$forum_count = $forum_stmt->rowCount();
 
-// Error handling for database query
-if (!$query) {
-    echo "Error: " . $db->error;
-    exit();
-}
 ?>
 
 <html>
@@ -109,8 +108,7 @@ if (!$query) {
     <div class="pagination">
         <?php
         // Calculate total number of pages
-        $total_pages_query = $db->query("SELECT COUNT(*) AS total FROM scpel_forum");
-        $total_rows = $total_pages_query->fetch_assoc()['total'];
+        $total_rows= $forum->totalPages();
         $total_pages = ceil($total_rows / $results_per_page);
 
         // Display pagination links
@@ -134,9 +132,7 @@ if (!$query) {
                                 
                                 
                             <?php 
-                                $query = mysqli_query($db,"SELECT * from scpel_forum order by ID DESC");
-                                    while($fetch = mysqli_fetch_assoc($query)){
-                                        ?>
+                                foreach($forum_stmt as $fetch){ ?>
                                         <li class="py-1 hover:bg-gray-100 cursor-pointer">
                                     <div  onclick="location.href='?thread=<?php echo $fetch['ID']; ?>'" class="flex items-center">
                                         <div class="flex-shrink-0">
@@ -164,6 +160,12 @@ if (!$query) {
                                     }
                                 ?>
 
+                                <?php
+                                if ($forum_count == 0) {
+                                    echo "<p>No discussions found.</p>";
+                                }
+                                ?>
+
                                 
                                 
                             </ul>
@@ -189,9 +191,7 @@ if (!$query) {
                         <?php 
 
                                     if(isset($_GET['thread'])){
-                                    
-                            $query2 = mysqli_query($db,"SELECT * from scpel_forum where ID='".$_GET['thread']."' ");
-                           $fetch_one = mysqli_fetch_assoc($query2);
+                           $fetch_one = $forum->readOne($_GET['thread']);
                                 
                                     
                                     ?>
@@ -233,9 +233,11 @@ if (!$query) {
                         </div>
 
                                     <?php
+                                    $forum_reply = new ForumReply($conn);
 
-                                    $query_replies = mysqli_query($db,"SELECT * from scpel_forum_replies where FORUM_ID='".$fetch_one['ID']."' ");
-                                    while($fetch_replies = mysqli_fetch_assoc($query_replies)){
+                                    $query_replies = $forum_reply->read($_GET['thread']);
+                                    
+                                    foreach($query_replies as $fetch_replies){
                                         ?>
 
 <div class="border ml-10 border-4 mb-4 border-gray-500">

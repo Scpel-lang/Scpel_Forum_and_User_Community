@@ -1,7 +1,11 @@
-<?php 
-    // $db = mysqli_connect('localhost','phrunsys_scpel_community','1s2c3p4e5l','phrunsys_scpel_community')or  die ('Database connection failed');
+<?php
 
+require_once 'db/db.php';
 
-   $db = mysqli_connect('localhost','root','admin@123','phrunsys_scpel_community')or  die ('Database connection failed');
+$db = Database::getInstance();
+$conn = $db->getConnection();
 
-?>
+if(!$conn) {
+    echo "Database connection failed. Please check your database configuration.";
+    exit;
+}
