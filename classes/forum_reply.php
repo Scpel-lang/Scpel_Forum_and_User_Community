@@ -14,9 +14,9 @@ class ForumReply
     public $SUBJECT;
     public $MESSAGE;
 
-    public function __construct($db)
+    public function __construct()
     {
-        $this->conn = $db;
+        $this->conn = $GLOBALS['conn'];
         $this->initializeTable();
     }
 

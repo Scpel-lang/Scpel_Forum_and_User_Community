@@ -1,6 +1,4 @@
 <?php
-// Include database connection
-include "db/connections.php";
 
 // Include classes
 include "classes/forum_reply.php";

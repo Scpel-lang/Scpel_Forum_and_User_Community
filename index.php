@@ -1,6 +1,5 @@
 <?php
 // Include database configuration file
-require_once "./db/connections.php";
 require_once "./classes/forum.php";
 require_once "./classes/forum_reply.php";
 

@@ -48,7 +48,6 @@ class Database
 
     public function setEnv($env)
     {
-        print_r($env);
         $this->host = $env['DB_HOST'];
         $this->db_name = $env['DB_NAME'];
         $this->username = $env['DB_USERNAME'];
