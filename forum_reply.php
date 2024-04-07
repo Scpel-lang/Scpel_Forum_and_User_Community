@@ -1,4 +1,5 @@
 <?php
+// Include database connection
 include "./db/connections.php";
 
 // Error handling for database connection
@@ -20,29 +21,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate and sanitize form data
     $errors = array();
 
+    // Sanitize and validate username
     if (empty($_POST["username"])) {
         $errors[] = "Username is required";
     } else {
         $username = sanitize_input($_POST["username"]);
     }
 
+    // Sanitize and validate email
     if (empty($_POST["email"])) {
         $errors[] = "Email is required";
     } else {
-        // Validate email format
-        if (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
+        $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Invalid email format";
-        } else {
-            $email = sanitize_input($_POST["email"]);
         }
     }
 
+    // Sanitize and validate subject
     if (empty($_POST["subject"])) {
         $errors[] = "Subject is required";
     } else {
         $subject = sanitize_input($_POST["subject"]);
     }
 
+    // Sanitize and validate message
     if (empty($_POST["message"])) {
         $errors[] = "Message is required";
     } else {
