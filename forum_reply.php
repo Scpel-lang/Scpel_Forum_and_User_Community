@@ -1,83 +1,98 @@
 <?php
 // Include database connection
-include "./db/connections.php";
+include "db/connections.php";
 
-// Error handling for database connection
-if ($db->connect_errno) {
-    echo "Failed to connect to MySQL: " . $db->connect_error;
-    exit();
-}
+// Include classes
+include "classes/forum_reply.php";
+include "classes/forum.php";
 
-// Function to sanitize input data
-function sanitize_input($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data);
-    return $data;
-}
-
-// Check if form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate and sanitize form data
-    $errors = array();
-
-    // Sanitize and validate username
-    if (empty($_POST["name"])) {
-        $errors[] = "Name is required";
-    } else {
-        $name = sanitize_input($_POST["name"]);
+class FormHandler {
+    private $forumReply;
+    
+    public function __construct($conn) {
+        $this->forumReply = new ForumReply($conn);
     }
 
-    // Sanitize and validate email
-    if (empty($_POST["email"])) {
-        $errors[] = "Email is required";
-    } else {
-        $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = "Invalid email format";
+    // Function to sanitize input data
+    public static function sanitizeInput($data) {
+        $data = trim($data);
+        $data = stripslashes($data);
+        $data = htmlspecialchars($data);
+        return $data;
+    }
+
+    public static function validateForm($name, $email, $subject, $message) {
+        $errors = array();
+
+        // Validate name
+        if (empty($name)) {
+            $errors[] = "Name is required";
         }
-    }
 
-    // Sanitize and validate subject
-    if (empty($_POST["subject"])) {
-        $errors[] = "Subject is required";
-    } else {
-        $subject = sanitize_input($_POST["subject"]);
-    }
-
-    // Sanitize and validate message
-    if (empty($_POST["message"])) {
-        $errors[] = "Message is required";
-    } else {
-        $message = sanitize_input($_POST["message"]);
-    }
-
-    // If no errors, insert data into database
-    if (empty($errors)) {
-        // Prepare and bind SQL statement
-        if ($stmt = $db->prepare("INSERT INTO scpel_forum_replies (FORUM_ID, USER_NAME, USER_EMAIL, SUBJECT, MESSAGE) VALUES (?, ?, ?, ?, ?)")) {
-            $stmt->bind_param("issss", $_POST["reply_thread_id"], $name, $email, $subject, $message);
-
-            // Execute SQL statement
-            if ($stmt->execute()) {
-                echo "Reply added successfully";
-            } else {
-                echo "Error: " . $stmt->error;
-            }
-
-            // Close statement
-            $stmt->close();
+        // Validate email
+        if (empty($email)) {
+            $errors[] = "Email is required";
         } else {
-            echo "Error preparing SQL statement: " . $db->error;
+            $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = "Invalid email format";
+            }
         }
-    } else {
-        // Display validation errors
-        foreach ($errors as $error) {
-            echo $error . "<br>";
+
+        // Validate subject
+        if (empty($subject)) {
+            $errors[] = "Subject is required";
+        }
+
+        // Validate message
+        if (empty($message)) {
+            $errors[] = "Message is required";
+        }
+
+        return $errors;
+    }
+
+    // Process form submission
+    public function processFormSubmission() {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            // Validate and sanitize form data
+            $errors = self::validateForm($_POST["name"], $_POST["email"], $_POST["subject"], $_POST["message"]);
+
+            $name = self::sanitizeInput($_POST["name"]);
+            $email = self::sanitizeInput($_POST["email"]);
+            $subject = self::sanitizeInput($_POST["subject"]);
+            $message = self::sanitizeInput($_POST["message"]);
+
+            // If no errors, insert data into database
+            if (empty($errors)) {
+                $this->forumReply->FORUM_ID = $_POST['reply_thread_id'];
+                $this->forumReply->USER_NAME = $name;
+                $this->forumReply->USER_EMAIL = $email;
+                $this->forumReply->SUBJECT = $subject;
+                $this->forumReply->MESSAGE = $message;
+
+                if ($this->forumReply->create()) {
+                    echo "Forum reply created successfully";
+                } else {
+                    echo "Error creating forum reply";
+                }
+            } else {
+                // Display validation errors
+                foreach ($errors as $error) {
+                    echo $error . "<br>";
+                }
+            }
         }
     }
 }
+
+// Instantiate the FormHandler
+$formHandler = new FormHandler($conn);
+
+// Process form submission
+$formHandler->processFormSubmission();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -322,7 +337,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <?php
                                 }
                                 else{
-                                    $query = mysqli_query($db,"INSERT INTO scpel_forum (`USER_NAME`,`USER_EMAIL`,`SUBJECT`,`MESSAGE`) values('$name','$email','$subject','$message')  ");
+                                    $forum->USER_NAME = $name;
+                                    $forum->USER_EMAIL = $email;
+                                    $forum->SUBJECT = $subject;
+                                    $forum->MESSAGE = $message;
+                                    $query = $forum->create();
                                     if ($query) {
                                         ?>
                                         <div class="p-4 w-full bg-green-400 text-white">The forum has been created, thank you for your contribution</div>
@@ -352,7 +371,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     <?php
                                 }
                                 else{
-                                    $query = mysqli_query($db,"INSERT INTO scpel_forum_replies (`USER_NAME`,`USER_EMAIL`,`SUBJECT`,`MESSAGE`,`FORUM_ID`) values('$name','$email','$subject','$message','".$_POST['reply_thread_id']."')  ");
+                                    $forum_reply->USER_NAME = $name;
+                                    $forum_reply->USER_EMAIL = $email;
+                                    $forum_reply->SUBJECT = $subject;
+                                    $forum_reply->MESSAGE = $message;
+                                    $query = $forum_reply->create();
                                     if ($query) {
                                         ?>
                                         <div class="p-4 w-full bg-green-400 text-white">The forum has been created, thank you for your contribution</div>
@@ -532,9 +555,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         class="block w-full px-0 text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
                                         placeholder="Write an article..." required><?php 
                                         if (isset($_GET['forum'])) {
-                            $get_query = mysqli_query($db,"SELECT * from scpel_forum where ID='".$_GET['forum']."' ");
-                            $fetch_s = mysqli_fetch_assoc($get_query);
-                            echo "> ".$fetch_s['MESSAGE'];
+                            $get_query = $forum->readOne($_GET['forum']);
+                            echo "> ".$get_query['MESSAGE'];
 
                         }
                         ?></textarea>
