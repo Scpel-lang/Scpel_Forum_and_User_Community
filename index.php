@@ -45,6 +45,15 @@ function fetchReplies($db, $threadID) {
     }
     return $replies;
 }
+
+// Function to insert reply into the database
+function insertReply($db, $forumID, $username, $subject, $message) {
+    $query = "INSERT INTO scpel_forum_replies (FORUM_ID, USER_NAME, SUBJECT, MESSAGE) VALUES (?, ?, ?, ?)";
+    $stmt = mysqli_prepare($db, $query);
+    mysqli_stmt_bind_param($stmt, "isss", $forumID, $username, $subject, $message);
+    mysqli_stmt_execute($stmt);
+    return $stmt;
+}
 ?>
 
 <!DOCTYPE html>
@@ -135,6 +144,55 @@ function fetchReplies($db, $threadID) {
     </div>
 </section>
 
+<!-- Reply Form -->
+<section class="max-w-screen-xl items-center h-[100vh] justify-between mx-auto">
+    <div class="flex">
+        <div class="m-auto ml-4 h-screen pb-20 text-justify">
+            <h2 class="text-2xl font-semibold mb-6">Reply to Thread</h2>
+            <form action="" method="post">
+                <input type="hidden" name="forum_id" value="<?php echo $_GET['forum']; ?>">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="subject">
+                        Subject
+                    </label>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="subject" type="text" placeholder="Enter Subject" name="subject" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="message">
+                        Message
+                    </label>
+                    <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="message" placeholder="Enter Message" name="message" required></textarea>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" name="reply">
+                        Reply
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 </body>
 </html>
+
+<?php
+// Reply submission
+if (isset($_POST['reply'])) {
+    $forumID = $_POST['forum_id'];
+    $subject = $_POST['subject'];
+    $message = $_POST['message'];
+    $username = $_SESSION['username'];
+
+    // Insert reply into the database
+    $inserted = insertReply($conn, $forumID, $username, $subject, $message);
+    if ($inserted) {
+        echo '<script>alert("Reply submitted successfully!");</script>';
+        // Redirect to the same page to avoid form resubmission
+        echo '<script>window.location.href = "./index.php";</script>';
+    } else {
+        echo '<script>alert("Failed to submit reply!");</script>';
+    }
+}
+?>
