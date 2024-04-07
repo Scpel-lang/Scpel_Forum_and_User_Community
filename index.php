@@ -2,8 +2,17 @@
 // Include database configuration file
 include_once "./db/connections.php";
 
-// Fetch discussions from the database
-$query = $db->query("SELECT * FROM scpel_forum ORDER BY ID DESC");
+// Pagination configuration
+$results_per_page = 10; // Number of discussions per page
+
+// Get current page number from URL, or set it to 1 if not provided
+$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+
+// Calculate the SQL LIMIT starting point for the current page
+$start_from = ($current_page - 1) * $results_per_page;
+
+// Fetch discussions from the database with pagination
+$query = $db->query("SELECT * FROM scpel_forum ORDER BY ID DESC LIMIT $start_from, $results_per_page");
 
 // Error handling for database query
 if (!$query) {
@@ -80,6 +89,21 @@ if (!$query) {
             </li>
         <?php endwhile; ?>
     </ul>
+</div>
+
+<!-- Pagination links -->
+<div class="pagination">
+    <?php
+    // Calculate total number of pages
+    $total_pages_query = $db->query("SELECT COUNT(*) AS total FROM scpel_forum");
+    $total_rows = $total_pages_query->fetch_assoc()['total'];
+    $total_pages = ceil($total_rows / $results_per_page);
+
+    // Display pagination links
+    for ($i = 1; $i <= $total_pages; $i++) {
+        echo "<a href='?page=$i'>$i</a> ";
+    }
+    ?>
 </div>
 
 <section class="max-w-screen-xl items-center h-[100vh] justify-between mx-auto">
