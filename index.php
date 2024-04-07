@@ -105,19 +105,6 @@ if (!$query) {
         </div>
     </nav>
 
-    <div class="latest-discussions">
-        <h2>Latest Discussions</h2>
-        <ul>
-            <?php while ($row = $query->fetch_assoc()): ?>
-                <li>
-                    <a href="view_discussion.php?id=<?php echo $row['ID']; ?>">
-                        <?php echo htmlspecialchars($row['SUBJECT']); ?>
-                    </a>
-                </li>
-            <?php endwhile; ?>
-        </ul>
-    </div>
-
     <!-- Pagination links -->
     <div class="pagination">
         <?php
