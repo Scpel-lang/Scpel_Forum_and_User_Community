@@ -1,16 +1,23 @@
 <?php
 
+require_once  'utils/dotenv.php';
+
+$env = __DIR__ . '/../.env';
+$env = parse_env($env);
+
+
 class Database
 {
     private static $instance = null;
-    private $host = "127.0.0.1";
-    private $db_name = "phrunsys_scpel_community";
-    private $username = "root";
-    private $password = "";
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
     public $conn;
 
     private function __construct()
     {
+        $this->setEnv($GLOBALS['env']);
         try {
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -38,4 +45,14 @@ class Database
     {
         return $this->conn;
     }
+
+    public function setEnv($env)
+    {
+        print_r($env);
+        $this->host = $env['DB_HOST'];
+        $this->db_name = $env['DB_NAME'];
+        $this->username = $env['DB_USERNAME'];
+        $this->password = $env['DB_PASSWORD'];
+    }
+
 }
