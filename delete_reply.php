@@ -1,5 +1,5 @@
 <?php
-include "./db/connections.php"; // Include your database connection file
+include "./db/connections.php"; 
 
 if (isset($_GET['reply_id'])) {
     $reply_id = $_GET['reply_id'];
