@@ -1,7 +1,18 @@
-<?php 
-    // $db = mysqli_connect('localhost','phrunsys_scpel_community','1s2c3p4e5l','phrunsys_scpel_community')or  die ('Database connection failed');
+<?php
+// Include database configuration file
+include_once "./db/connections.php";
 
+// Establish database connection
+$db = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-   $db = mysqli_connect('localhost','root','admin@123','phrunsys_scpel_community')or  die ('Database connection failed');
+// Check connection
+if (!$db) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
 
+// Set charset to UTF8 to support special characters
+mysqli_set_charset($db, "utf8");
+
+// Return $db object for further database operations
+return $db;
 ?>
