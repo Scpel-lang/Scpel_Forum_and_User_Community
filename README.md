@@ -22,5 +22,3 @@ As this project comprises only three files, the initial focus should be on under
 **Note:** The first person to comprehend the system logic should update this README so that others can easily understand and contribute with minimal hurdles.
 
 Good luck!
-
-# Updated by ```Diana Joanita Nakyazze```
