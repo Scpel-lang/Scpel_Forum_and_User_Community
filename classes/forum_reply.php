@@ -89,6 +89,20 @@ class ForumReply
         return $row['total_rows'];
     }
 
+    public function paginate($from_record_num, $records_per_page)
+    {
+        $query = "SELECT * FROM " . $this->table_name . " ORDER BY CREATED_AT DESC LIMIT ?, ?";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindParam(1, $from_record_num, PDO::PARAM_INT);
+        $stmt->bindParam(2, $records_per_page, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+        return $stmt;
+    }
+
     public function readOne()
     {
         $query = "SELECT * FROM " . $this->table_name . " WHERE ID = ?";
