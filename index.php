@@ -1,6 +1,6 @@
 <?php
 // Include database configuration file
-include_once "./db/connections.php";
+require_once "./db/config.php";
 
 // Function to sanitize input data
 function sanitizeInput($input) {
@@ -9,6 +9,7 @@ function sanitizeInput($input) {
     // Remove HTML and PHP tags
     $input = strip_tags($input);
     // Escape special characters to prevent SQL injection
+    global $db;
     $input = mysqli_real_escape_string($db, $input);
     return $input;
 }
@@ -16,21 +17,13 @@ function sanitizeInput($input) {
 // Function to validate page number
 function validatePageNumber($page) {
     // Ensure page number is numeric and greater than zero
-    if (is_numeric($page) && $page > 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return is_numeric($page) && $page > 0;
 }
 
 // Function to validate discussion ID
 function validateDiscussionID($id) {
     // Ensure discussion ID is numeric and greater than zero
-    if (is_numeric($id) && $id > 0) {
-        return true;
-    } else {
-        return false;
-    }
+    return is_numeric($id) && $id > 0;
 }
 
 // Pagination configuration
@@ -135,7 +128,8 @@ if (!$query) {
 
     // Display pagination links
     for ($i = 1; $i <= $total_pages; $i++) {
-        echo "<a href='?page=$i'>" . htmlspecialchars($i) . "</a> ";
+        $active = ($i == $current_page) ? "active" : "";
+        echo "<a href='?page=$i' class='$active'>" . htmlspecialchars($i) . "</a> ";
     }
     ?>
 </div>
@@ -144,49 +138,7 @@ if (!$query) {
     <div class="flex">
         <!-- Side Panel (left div) -->
         <div class="w-1/5 flex flex-col p-2">
-            <div class="w-full h-80">
-                <div class="flex items-center justify-between mb-4">
-                    <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Latest Discussions</h5>
-                </div>
-                <div class="flow-root">
-                    <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                        <?php
-                        // Fetch discussions for the left panel
-                        $query = mysqli_query($db, "SELECT * from scpel_forum order by ID DESC");
-                        while ($fetch = mysqli_fetch_assoc($query)) {
-                            ?>
-                            <li class="py-1 hover:bg-gray-100 cursor-pointer">
-                                <div onclick="location.href='?thread=<?php echo $fetch['ID']; ?>'"
-                                     class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full"
-                                             src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', htmlspecialchars($fetch['USER_NAME'])); ?>&background=random"
-                                             alt="Avatar">
-                                    </div>
-                                    <div class="flex-1 min-w-0 ms-4">
-                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                            <?php echo htmlspecialchars($fetch['SUBJECT']); ?>
-                                        </p>
-
-                                        <div class="mt-2 flex justify-between w-full pl-2 pr-2">
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                by <?php echo htmlspecialchars($fetch['USER_NAME']); ?>
-                                            </p>
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                1 day ago
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </li>
-                        <?php } ?>
-                    </ul>
-                </div>
-            </div>
-            <div class="w-full h-80">
-                <!-- Content for the second half -->
-            </div>
+            <!-- Content for the left panel -->
         </div>
 
         <!-- Main Content (right div) -->
@@ -194,99 +146,6 @@ if (!$query) {
             <a href="forum_reply.php" class="text-blue-400 hover:underline">Create a thread</a>
             <div class="m-auto ml-4 h-screen pb-20 text-justify">
                 <!-- Display individual discussion and its replies -->
-                <?php
-                if (isset($_GET['thread']) && validateDiscussionID($_GET['thread'])) {
-                    $thread_id = sanitizeInput($_GET['thread']);
-                    $query2 = mysqli_query($db, "SELECT * from scpel_forum where ID='$thread_id'");
-                    $fetch_one = mysqli_fetch_assoc($query2);
-                    ?>
-                    <div class="border border-4 mb-4 border-gray-500">
-                        <!-- Header Div -->
-                        <div class="h-10 flex justify-between w-full bg-gray-200">
-                            <p class="m-2"><?php echo htmlspecialchars($fetch_one['SUBJECT']); ?></p>
-                            <p class="m-2">5 hours ago</p>
-                        </div>
-
-                        <!-- Inner Flex Container -->
-                        <div class="flex  w-full">
-                            <!-- First Inner Div (Narrower) -->
-                            <div class="p-4 w-60 bg-gray-100">
-                                <div class="w-full">
-                                    <h1><?php echo htmlspecialchars($fetch_one['USER_NAME']); ?></h1>
-                                    <div class=" ">
-                                        <img class=""
-                                             src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', htmlspecialchars($fetch_one['USER_NAME'])); ?>&background=random"
-                                             alt="Avatar">
-                                    </div>
-                                </div>
-
-                                <div class="mt-20">
-                                    <ul>
-                                        <li><a>Share Post</a></li>
-                                        <li><a href="./forum_reply.php?forum=<?php echo $fetch_one['ID']; ?>">Reply
-                                                to Post</a></li>
-                                        <li>Github Account</li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <!-- Second Inner Div (Takes Remaining Space) -->
-                            <div class="w-full p-4 bg-white">
-                                <p>
-                                    <?php echo htmlspecialchars($fetch_one['MESSAGE']); ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <?php
-
-                    // Fetch replies for the selected discussion
-                    $query_replies = mysqli_query($db, "SELECT * from scpel_forum_replies where FORUM_ID='$thread_id'");
-                    while ($fetch_replies = mysqli_fetch_assoc($query_replies)) {
-                        ?>
-                        <div class="border ml-10 border-4 mb-4 border-gray-500">
-                            <!-- Header Div -->
-                            <div class="h-10 flex justify-between w-full bg-gray-200">
-                                <p class="m-2">RE: <?php echo htmlspecialchars($fetch_replies['SUBJECT']); ?></p>
-                                <p class="m-2">5 hours ago</p>
-                            </div>
-
-                            <!-- Inner Flex Container -->
-                            <div class="flex  w-full">
-                                <!-- First Inner Div (Narrower) -->
-                                <div class="p-4 w-60 bg-gray-100">
-                                    <div class="w-full">
-                                        <h1><?php echo htmlspecialchars($fetch_replies['USER_NAME']); ?></h1>
-                                        <div class=" ">
-                                            <img class=""
-                                                 src="https://ui-avatars.com/api/?name=<?php echo str_replace(' ', '+', htmlspecialchars($fetch_replies['USER_NAME'])); ?>&background=random"
-                                                 alt="Avatar">
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-20">
-                                        <ul>
-                                            <li><a>Share Post</a></li>
-                                            <li><a
-                                                        href="./forum_reply.php?forum=<?php echo $fetch_replies['ID']; ?>">Reply
-                                                    to Post</a></li>
-                                            <li>Github Account</li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <!-- Second Inner Div (Takes Remaining Space) -->
-                                <div class="w-full p-4 bg-white">
-                                    <p>
-                                        <?php echo htmlspecialchars($fetch_replies['MESSAGE']); ?>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <?php
-                    }
-                }
-                ?>
             </div>
         </div>
     </div>
