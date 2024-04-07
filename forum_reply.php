@@ -1,3 +1,77 @@
+<?php
+include "./db/connections.php";
+
+// Error handling for database connection
+if ($db->connect_errno) {
+    echo "Failed to connect to MySQL: " . $db->connect_error;
+    exit();
+}
+
+// Function to sanitize input data
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate and sanitize form data
+    $errors = array();
+
+    if (empty($_POST["username"])) {
+        $errors[] = "Username is required";
+    } else {
+        $username = sanitize_input($_POST["username"]);
+    }
+
+    if (empty($_POST["email"])) {
+        $errors[] = "Email is required";
+    } else {
+        // Validate email format
+        if (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email format";
+        } else {
+            $email = sanitize_input($_POST["email"]);
+        }
+    }
+
+    if (empty($_POST["subject"])) {
+        $errors[] = "Subject is required";
+    } else {
+        $subject = sanitize_input($_POST["subject"]);
+    }
+
+    if (empty($_POST["message"])) {
+        $errors[] = "Message is required";
+    } else {
+        $message = sanitize_input($_POST["message"]);
+    }
+
+    // If no errors, insert data into database
+    if (empty($errors)) {
+        // Prepare and bind SQL statement
+        $stmt = $db->prepare("INSERT INTO scpel_forum_replies (FORUM_ID, USER_NAME, USER_EMAIL, SUBJECT, MESSAGE) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("issss", $_POST["forum_id"], $username, $email, $subject, $message);
+
+        // Execute SQL statement
+        if ($stmt->execute()) {
+            echo "Reply added successfully";
+        } else {
+            echo "Error: " . $stmt->error;
+        }
+
+        // Close statement
+        $stmt->close();
+    } else {
+        // Display validation errors
+        foreach ($errors as $error) {
+            echo $error . "<br>";
+        }
+    }
+}
+?>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
