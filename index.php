@@ -4,9 +4,6 @@ session_start();
 // Include database connection
 include_once "./db_connection.php";
 
-// Initialize error variable
-$error = "";
-
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
@@ -15,9 +12,8 @@ if (!isset($_SESSION['username'])) {
 
 // Logout functionality
 if (isset($_POST['logout'])) {
-    session_unset(); // Unset all session variables
     session_destroy(); // Destroy session data
-    header("Location: login.php");
+    header("Location: login.php"); // Redirect to login page after logout
     exit();
 }
 
@@ -30,8 +26,6 @@ function fetchLatestDiscussions($db) {
         while ($fetch = mysqli_fetch_assoc($result)) {
             $discussions[] = $fetch;
         }
-    } else {
-        $error = "Error fetching discussions: " . mysqli_error($db);
     }
     return $discussions;
 }
@@ -48,25 +42,11 @@ function fetchReplies($db, $threadID) {
         while ($fetch = mysqli_fetch_assoc($result)) {
             $replies[] = $fetch;
         }
-    } else {
-        $error = "Error fetching replies: " . mysqli_error($db);
     }
     return $replies;
 }
-
-// Check if thread ID is provided in URL, then fetch thread and replies
-if (isset($_GET['thread'])) {
-    $threadID = $_GET['thread'];
-    $threadQuery = mysqli_query($db, "SELECT * FROM scpel_forum WHERE ID='$threadID'");
-    if ($threadQuery) {
-        $thread = mysqli_fetch_assoc($threadQuery);
-        $replies = fetchReplies($db, $threadID);
-    } else {
-        $error = "Error fetching thread: " . mysqli_error($db);
-    }
-}
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,7 +63,6 @@ if (isset($_GET['thread'])) {
 <!-- Navigation Bar -->
 <?php include_once "navbar.php"; ?>
 
-<!-- Main Content -->
 <section class="max-w-screen-xl items-center h-[100vh] justify-between mx-auto">
     <div class="flex">
         <!-- Side Panel (left div) -->
@@ -91,33 +70,71 @@ if (isset($_GET['thread'])) {
 
         <!-- Main Content (right div) -->
         <div class="flex-1 h-full items-center justify-center relative">
-            <a href="create_thread.php" class="text-blue-400 hover:underline">Create a thread</a>
             <div class="m-auto ml-4 h-screen pb-20 text-justify">
-                <?php if(isset($_GET['thread'])): ?>
-                    <!-- Display Thread and Replies -->
-                    <?php include_once "thread_display.php"; ?>
-                <?php else: ?>
-                    <!-- Display list of threads -->
-                    <h2 class="text-2xl font-semibold mb-6">Latest Discussions</h2>
-                    <?php foreach(fetchLatestDiscussions($db) as $discussion): ?>
-                        <div class="py-4 border-b border-gray-200">
-                            <h3 class="text-xl font-semibold"><?php echo $discussion['SUBJECT']; ?></h3>
-                            <p class="text-gray-600">By <?php echo $discussion['USER_NAME']; ?> - <?php echo $discussion['CREATION_DATE']; ?></p>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                <h2 class="text-2xl font-semibold mb-6">Latest Threads</h2>
+                <?php
+                $discussions = fetchLatestDiscussions($conn);
+                foreach ($discussions as $discussion) {
+                    echo '<div class="border border-4 mb-4 border-gray-500">';
+                    echo '<div class="h-10 flex justify-between w-full bg-gray-200">';
+                    echo '<p class="m-2">' . $discussion['SUBJECT'] . '</p>';
+                    echo '<p class="m-2">' . $discussion['CREATION_DATE'] . '</p>';
+                    echo '</div>';
+                    echo '<div class="flex  w-full">';
+                    echo '<div class="p-4 w-60 bg-gray-100">';
+                    echo '<div class="w-full">';
+                    echo '<h1>' . $discussion['USER_NAME'] . '</h1>';
+                    echo '<div class=""><img class="" src="https://ui-avatars.com/api/?name=' . urlencode($discussion['USER_NAME']) . '&background=random"></div>';
+                    echo '</div>';
+                    echo '<div class="mt-20">';
+                    echo '<ul>';
+                    echo '<li><a>Share Post</a></li>';
+                    echo '<li><a href="./forum_reply.php?forum=' . $discussion['ID'] . '">Reply to Post</a></li>';
+                    echo '<li>Github Account</li>';
+                    echo '</ul>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '<div class="w-full p-4 bg-white">';
+                    echo '<p>' . $discussion['MESSAGE'] . '</p>';
+                    echo '</div>';
+                    echo '</div>';
+                    echo '</div>';
+
+                    // Fetch and display replies for this thread
+                    $replies = fetchReplies($conn, $discussion['ID']);
+                    foreach ($replies as $reply) {
+                        echo '<div class="border ml-10 border-4 mb-4 border-gray-500">';
+                        echo '<div class="h-10 flex justify-between w-full bg-gray-200">';
+                        echo '<p class="m-2">RE: ' . $reply['SUBJECT'] . '</p>';
+                        echo '<p class="m-2">' . $reply['CREATION_DATE'] . '</p>';
+                        echo '</div>';
+                        echo '<div class="flex  w-full">';
+                        echo '<div class="p-4 w-60 bg-gray-100">';
+                        echo '<div class="w-full">';
+                        echo '<h1>' . $reply['USER_NAME'] . '</h1>';
+                        echo '<div class=""><img class="" src="https://ui-avatars.com/api/?name=' . urlencode($reply['USER_NAME']) . '&background=random"></div>';
+                        echo '</div>';
+                        echo '<div class="mt-20">';
+                        echo '<ul>';
+                        echo '<li><a>Share Post</a></li>';
+                        echo '<li><a href="./forum_reply.php?forum=' . $reply['ID'] . '">Reply to Post</a></li>';
+                        echo '<li>Github Account</li>';
+                        echo '</ul>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '<div class="w-full p-4 bg-white">';
+                        echo '<p>' . $reply['MESSAGE'] . '</p>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                }
+                ?>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
 </body>
 </html>
-<?php
-// Display error message if there's an error
-if (isset($error)) {
-    echo "<p>Error: $error</p>";
-}
-?>
