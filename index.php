@@ -4,6 +4,9 @@ session_start();
 // Include database connection
 include_once "./db_connection.php";
 
+// Initialize error variable
+$error = "";
+
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
@@ -12,13 +15,11 @@ if (!isset($_SESSION['username'])) {
 
 // Logout functionality
 if (isset($_POST['logout'])) {
+    session_unset(); // Unset all session variables
     session_destroy(); // Destroy session data
     header("Location: login.php");
     exit();
 }
-
-// Initialize error variable
-$error = "";
 
 // Function to fetch latest discussions
 function fetchLatestDiscussions($db) {
@@ -95,6 +96,15 @@ if (isset($_GET['thread'])) {
                 <?php if(isset($_GET['thread'])): ?>
                     <!-- Display Thread and Replies -->
                     <?php include_once "thread_display.php"; ?>
+                <?php else: ?>
+                    <!-- Display list of threads -->
+                    <h2 class="text-2xl font-semibold mb-6">Latest Discussions</h2>
+                    <?php foreach(fetchLatestDiscussions($db) as $discussion): ?>
+                        <div class="py-4 border-b border-gray-200">
+                            <h3 class="text-xl font-semibold"><?php echo $discussion['SUBJECT']; ?></h3>
+                            <p class="text-gray-600">By <?php echo $discussion['USER_NAME']; ?> - <?php echo $discussion['CREATION_DATE']; ?></p>
+                        </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
         </div>
