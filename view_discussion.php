@@ -34,23 +34,19 @@ if (!$replies_query) {
     exit();
 }
 ?>
-<html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Welcome to Scpel - A Systems reflective meta-programming language for AI</title>
-        <!-- Include Tailwind CSS -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-    
-        <link rel="stylesheet" type="text/css" href="../docs/styles.css">
-    
-        <link rel="stylesheet" href="./sheety.css" />
-        <?php include "./db/connections.php" ?>
-    </head>
-    
-    <body class="h-screen">
-    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Scpel - A Systems reflective meta-programming language for AI</title>
+    <!-- Include Tailwind CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../docs/styles.css">
+    <link rel="stylesheet" href="./sheety.css" />
+</head>
+<body class="h-screen">
     
         <nav class="bg-white border-gray-200 dark:bg-gray-900">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
