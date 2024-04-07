@@ -1,19 +1,97 @@
+<?php
+// Include database connection
+include "./db/connections.php";
+
+// Error handling for database connection
+if ($db->connect_errno) {
+    echo "Failed to connect to MySQL: " . $db->connect_error;
+    exit();
+}
+
+// Function to sanitize input data
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate and sanitize form data
+    $errors = array();
+
+    // Sanitize and validate username
+    if (empty($_POST["name"])) {
+        $errors[] = "Name is required";
+    } else {
+        $name = sanitize_input($_POST["name"]);
+    }
+
+    // Sanitize and validate email
+    if (empty($_POST["email"])) {
+        $errors[] = "Email is required";
+    } else {
+        $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email format";
+        }
+    }
+
+    // Sanitize and validate subject
+    if (empty($_POST["subject"])) {
+        $errors[] = "Subject is required";
+    } else {
+        $subject = sanitize_input($_POST["subject"]);
+    }
+
+    // Sanitize and validate message
+    if (empty($_POST["message"])) {
+        $errors[] = "Message is required";
+    } else {
+        $message = sanitize_input($_POST["message"]);
+    }
+
+    // If no errors, insert data into database
+    if (empty($errors)) {
+        // Prepare and bind SQL statement
+        if ($stmt = $db->prepare("INSERT INTO scpel_forum_replies (FORUM_ID, USER_NAME, USER_EMAIL, SUBJECT, MESSAGE) VALUES (?, ?, ?, ?, ?)")) {
+            $stmt->bind_param("issss", $_POST["reply_thread_id"], $name, $email, $subject, $message);
+
+            // Execute SQL statement
+            if ($stmt->execute()) {
+                echo "Reply added successfully";
+            } else {
+                echo "Error: " . $stmt->error;
+            }
+
+            // Close statement
+            $stmt->close();
+        } else {
+            echo "Error preparing SQL statement: " . $db->error;
+        }
+    } else {
+        // Display validation errors
+        foreach ($errors as $error) {
+            echo $error . "<br>";
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Scpel - A Systems reflective meta-programming language for AI</title>
     <!-- Include Tailwind CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../docs/styles.css">
-
-    <link rel="stylesheet" href="./sheety.css" />
-    <?php include "./db/connections.php" ?>
+    <link rel="stylesheet" href="./sheety.css">
 </head>
-
 <body class="h-screen">
-
 
     <nav class="bg-white border-gray-200 dark:bg-gray-900">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -545,8 +623,6 @@
             </div>
         </div>
     </section>
-
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
     <script>
