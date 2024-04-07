@@ -10,6 +10,9 @@ if (isset($_SESSION['username'])) {
     exit();
 }
 
+// Initialize $error variable
+$error = "";
+
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get username and password from the form
@@ -21,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = "Please enter both username and password";
     } else {
         // Prepare and execute SQL query to fetch user from database
-        $sql = "SELECT * FROM users WHERE username = ?";
+        $sql = "SELECT * FROM scpel_users WHERE USERNAME = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -30,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Check if user exists and password is correct
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
-            if (password_verify($password, $row['password'])) {
+            if (password_verify($password, $row['PASSWORD'])) {
                 // Password is correct, set session variables and redirect to home page
                 $_SESSION['username'] = $username;
                 header("Location: index.php");
@@ -62,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="max-w-md w-full">
         <div class="bg-white rounded-lg shadow-md p-8">
             <h2 class="text-2xl font-semibold mb-6">Login</h2>
-            <?php if (isset($error)): ?>
+            <?php if (!empty($error)): ?>
                 <p class="text-red-500 mb-4"><?php echo $error; ?></p>
             <?php endif; ?>
             <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
