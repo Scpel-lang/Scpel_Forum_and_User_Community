@@ -22,10 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = array();
 
     // Sanitize and validate username
-    if (empty($_POST["username"])) {
-        $errors[] = "Username is required";
+    if (empty($_POST["name"])) {
+        $errors[] = "Name is required";
     } else {
-        $username = sanitize_input($_POST["username"]);
+        $name = sanitize_input($_POST["name"]);
     }
 
     // Sanitize and validate email
@@ -55,18 +55,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // If no errors, insert data into database
     if (empty($errors)) {
         // Prepare and bind SQL statement
-        $stmt = $db->prepare("INSERT INTO scpel_forum_replies (FORUM_ID, USER_NAME, USER_EMAIL, SUBJECT, MESSAGE) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("issss", $_POST["forum_id"], $username, $email, $subject, $message);
+        if ($stmt = $db->prepare("INSERT INTO scpel_forum_replies (FORUM_ID, USER_NAME, USER_EMAIL, SUBJECT, MESSAGE) VALUES (?, ?, ?, ?, ?)")) {
+            $stmt->bind_param("issss", $_POST["reply_thread_id"], $name, $email, $subject, $message);
 
-        // Execute SQL statement
-        if ($stmt->execute()) {
-            echo "Reply added successfully";
+            // Execute SQL statement
+            if ($stmt->execute()) {
+                echo "Reply added successfully";
+            } else {
+                echo "Error: " . $stmt->error;
+            }
+
+            // Close statement
+            $stmt->close();
         } else {
-            echo "Error: " . $stmt->error;
+            echo "Error preparing SQL statement: " . $db->error;
         }
-
-        // Close statement
-        $stmt->close();
     } else {
         // Display validation errors
         foreach ($errors as $error) {
@@ -137,158 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <section class="max-w-screen-xl items-center h-[100vh] justify-between mx-auto">
         <div class="flex">
             <!-- Side Panel (left div) -->
-            <div class="w-1/5 flex flex-col p-2">
-                <div class="w-full h-80">
-                    <div class="flex items-center justify-between mb-4">
-                        <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white">Latest Discussions</h5>
-                    </div>
-                    <div class="flow-root">
-                        <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-                            <li class="py-1 hover:bg-gray-100 cursor-pointer">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full"
-                                            src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                    </div>
-                                    <div class="flex-1 min-w-0 ms-4">
-                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                            Introducing an interpreter in the GCC internal structure...
-                                        </p>
-
-                                        <div class="mt-2 flex justify-between w-full pl-2 pr-2">
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                by Francis Ssessaazi
-                                            </p>
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                1 day ago
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </li>
-                            <li class="py-1 hover:bg-gray-100 cursor-pointer">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full"
-                                            src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                    </div>
-                                    <div class="flex-1 min-w-0 ms-4">
-                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                            Introducing an interpreter in the GCC internal structure...
-                                        </p>
-
-                                        <div class="mt-2 flex justify-between w-full pl-2 pr-2">
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                by Francis Ssessaazi
-                                            </p>
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                1 day ago
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </li>
-                            <li class="py-1 hover:bg-gray-100 cursor-pointer">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full"
-                                            src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                    </div>
-                                    <div class="flex-1 min-w-0 ms-4">
-                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                            Introducing an interpreter in the GCC internal structure...
-                                        </p>
-
-                                        <div class="mt-2 flex justify-between w-full pl-2 pr-2">
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                by Francis Ssessaazi
-                                            </p>
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                1 day ago
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </li>
-                            <li class="py-1 hover:bg-gray-100 cursor-pointer">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full"
-                                            src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                    </div>
-                                    <div class="flex-1 min-w-0 ms-4">
-                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                            Introducing an interpreter in the GCC internal structure...
-                                        </p>
-
-                                        <div class="mt-2 flex justify-between w-full pl-2 pr-2">
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                by Francis Ssessaazi
-                                            </p>
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                1 day ago
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </li>
-                            <li class="py-1 hover:bg-gray-100 cursor-pointer">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full"
-                                            src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                    </div>
-                                    <div class="flex-1 min-w-0 ms-4">
-                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                            Introducing an interpreter in the GCC internal structure...
-                                        </p>
-
-                                        <div class="mt-2 flex justify-between w-full pl-2 pr-2">
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                by Francis Ssessaazi
-                                            </p>
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                1 day ago
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </li>
-                            <li class="py-1 hover:bg-gray-100 cursor-pointer">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full"
-                                            src="/docs/images/people/profile-picture-1.jpg" alt="Neil image">
-                                    </div>
-                                    <div class="flex-1 min-w-0 ms-4">
-                                        <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                                            Introducing an interpreter in the GCC internal structure...
-                                        </p>
-
-                                        <div class="mt-2 flex justify-between w-full pl-2 pr-2">
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                by Francis Ssessaazi
-                                            </p>
-                                            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                                                1 day ago
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="w-full h-80">
-                    <!-- Content for the second half -->
-                </div>
-            </div>
+            
 
             <!-- Main Content (right div) -->
             <div class="flex-1 h-full items-center justify-center relative">
