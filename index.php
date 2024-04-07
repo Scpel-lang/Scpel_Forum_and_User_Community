@@ -200,7 +200,6 @@ if (!$query) {
                         <!-- Outer Container with Border -->                 
 
                         <?php 
-
                                     if(isset($_GET['thread'])){
                                     
                             $query2 = mysqli_query($db,"SELECT * from scpel_forum where ID='".$_GET['thread']."' ");
@@ -299,7 +298,8 @@ if (!$query) {
                 </div>
             </div>
         </section>
+   
     
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
-</body>
+    </body>
 </html>
