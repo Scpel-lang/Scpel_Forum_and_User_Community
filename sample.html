@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Side Panel Example</title>
+<style>
+  body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container {
+    position: relative;
+    display: flex;
+  }
+
+  .side-panel {
+    position: absolute;
+    top: 0;
+    left: -250px; /* Initially hidden */
+    width: 250px;
+    height: 100%;
+    background-color: #f4f4f4;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+    transition: left 0.3s ease;
+  }
+
+  .main-content {
+    padding-left: 20px; /* To prevent content from being covered by the side panel */
+    width: 60%;
+    margin-left: 500px;
+  }
+
+  .open-btn {
+    /* position: absolute; */
+    top: 20px;
+    left: 20px;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="side-panel" id="sidePanel">
+    <button class="close-btn" onclick="toggleSidePanel()">Close</button>
+    <!-- Content of the side panel -->
+    <p>This is the side panel content.</p>
+  </div>
+  <div class="main-content">
+    <button class="open-btn" onclick="toggleSidePanel()">Open Side Panel</button>
+    <!-- Main content of the page -->
+    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laudantium quis esse rerum ea deleniti aut dicta dolores culpa soluta nulla error adipisci, nostrum aliquid neque odit illo modi iste ad, eius laboriosam quae doloremque natus! Vero veniam odio quam asperiores hic delectus voluptates beatae quas commodi sapiente placeat neque numquam quaerat ratione repudiandae illo consequuntur molestias nemo minima facere excepturi, perferendis veritatis iure assumenda. Harum, officiis vel natus aperiam illo necessitatibus molestiae sit soluta non ratione porro corrupti eius quisquam. Perferendis suscipit sapiente animi iste qui quasi recusandae, ex numquam, molestias cupiditate laborum et nobis aspernatur quis quo culpa? Natus deserunt voluptate, unde quo, adipisci quisquam, maiores labore reiciendis laudantium hic quaerat eum cumque omnis expedita quis. Corrupti quaerat expedita amet voluptates obcaecati nisi, deserunt facere suscipit odio hic quod quas voluptatem consequuntur eos vel cupiditate soluta. Voluptatum doloribus sit eaque assumenda labore quasi delectus quia qui ad, illum esse? Aut eveniet cum fuga pariatur nam neque mollitia reprehenderit ea, ratione qui cumque debitis minima nulla commodi laudantium accusamus a! Nulla, maxime cupiditate error ducimus nisi dignissimos rerum minima cum quo molestias ullam corporis amet neque deserunt! Fugiat ut molestias magnam aperiam voluptate qui reiciendis, natus culpa officiis cumque ex!</p>
+  </div>
+</div>
+
+<script>
+  function toggleSidePanel() {
+    var sidePanel = document.getElementById('sidePanel');
+    if (sidePanel.style.left === '-250px' || !sidePanel.style.left) {
+      sidePanel.style.left = '0'; // Slide in the side panel
+    } else {
+      sidePanel.style.left = '-250px'; // Slide out the side panel
+    }
+  }
+</script>
+
+</body>
+</html>

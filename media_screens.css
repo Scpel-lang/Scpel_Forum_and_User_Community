@@ -1,0 +1,85 @@
+@media screen 
+and (min-width: 100px)
+and (max-width: 1400px) {
+#side_panel {
+    display: none;
+}
+#thread_2 {
+    display: none;
+}
+#thread_3 {
+    display: flex;
+    width: 100%;
+    background-color: #d1d5db;
+}
+#thread_4 {
+    display: block;
+}
+#thread_6 {
+    display: none;
+}
+
+#like_img_1 {
+    width: 20px;
+    height: 20px;
+}
+
+#del_btn_1 {
+    width: 20px;
+    height: 20px;
+}
+#thread_7 {
+
+}
+#reply_l1 {
+    display: none;
+}
+#like_l3 {
+    display: none;
+}
+body {
+    font-size: 20px;
+}
+
+#mobile_sidePanel {
+    background-color: #d1d5db;
+    width: 300px;
+    padding-top: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    display: block;
+}
+}
+
+@media screen
+and (min-width: 100px)
+and (max-width: 768px) {
+
+}
+
+/* .mobile_container {
+    position: relative;
+  } */
+  
+  .mobile_side-panel {
+    position: absolute;
+    top: 0;
+    left: -250px; /* Initially hidden */
+    width: 250px;
+    height: 100vh;
+    z-index: 9000;
+    transition: left 0.3s ease;
+  }
+
+  
+  .mobile_open-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+  
+  .mobile_close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
