@@ -49,6 +49,9 @@ body {
     padding-right: 8px;
     display: block;
 }
+#side_panel_reveal_2 {
+    display: block;
+}
 }
 
 @media screen
