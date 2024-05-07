@@ -10,15 +10,15 @@
 
 <body class="h-screen">
     <!-- Nav bar -->
-    <nav class="bg-white dark:bg-gray-900 w-full z-50 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+    <nav class="bg-[#745085] text-white dark:bg-gray-900 w-full z-50 top-0 start-0 border-b border-gray-200 dark:border-gray-600">
+        <div class="max-w-screen-xl bg-[#745085] flex flex-wrap items-center justify-between mx-auto p-4">
           <a href="index.html" class="flex items-center space-x-3 rtl:space-x-reverse">
             <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Scpel</span>
           </a>
           <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             <button type="button"
               class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"><a
-                href="./accounts/login.html">Sign In</a> </button>
+                href="./login.html">Login</a> </button>
             <button data-collapse-toggle="navbar-sticky" type="button"
               class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
               aria-controls="navbar-sticky" aria-expanded="false">
@@ -29,7 +29,7 @@
               </svg>
             </button>
           </div>
-          <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+          <div class="items-center bg-[#745085] justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
             <ul
               class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
               <li>
@@ -88,7 +88,7 @@
                                 </div>
                                 <div class="flex-shrink-0">
                                     <img class="w-8 h-8 rounded-full"
-                                        src="./icons8-delete-button.gif" alt="Neil image">
+                                        src="./delete.png" alt="Neil image">
                                 </div>
                             </div>
                         </li>
@@ -130,8 +130,8 @@
                                         </div>
                                     </div>
                                     <div class="flex-shrink-0">
-                                        <img class="w-8 h-8 rounded-full"
-                                            src="./icons8-delete-button.gif" alt="Neil image">
+                                        <img class="w-4 h-4 rounded-full"
+                                            src="./delete.png" alt="Neil image">
                                     </div>
                                 </div>
                             </li>
@@ -163,7 +163,7 @@
                 <div class="m-auto ml-4 mt-2 h-screen custom-scrollbar pb-20 text-justify">
 
                     <!-- Original Post -->
-                    <div id="thread" class="border border-4 mb-4 border-gray-500">
+                    <div id="thread" class="mb-4 border-gray-500">
                         <!-- Header Div -->
                         <div id="thread_2" class="h-10 flex justify-between w-full bg-gray-200">
                             <div class="flex m-2">
@@ -171,7 +171,7 @@
                                 <p class="pl-4">Announcing Scpel 1.0.0.0. Lets roll!</p>
                             </div>
                             <div class="flex m-2">
-                                <img style="cursor: pointer;" src="./icons8-delete-button.gif">
+                                <img style="cursor: pointer;" src="./delete.png">
                             </div>
                         </div>
 
@@ -184,10 +184,10 @@
                             <div class="flex m-2">
                                 <p class="pr-4">5 hours ago</p>
                                 <div class="flex pr-4">
-                                    <img id="like_img_1" style="cursor: pointer; max-width: 60px;" src="./icons8-like.gif">
+                                    <img id="like_img_1" style="cursor: pointer; max-width: 60px;" src="./like.png">
                                     <p class="m-auto pl-1">25</p>
                                 </div>
-                                <img id="del_btn_1" style="cursor: pointer;" src="./icons8-delete-button.gif">
+                                <img id="del_btn_1" style="cursor: pointer;" src="./delete.png">
                             </div>
                         </div>
 
@@ -214,8 +214,8 @@
                                                 </div>
                                             </div>
                                             <div class="flex ">
-                                                    <img class="ml-2 mr-2" style="cursor: pointer; max-width: 30px;" src="./icons8-reply-arrow.gif">
-                                                    <img class="mr-2" style="cursor: pointer; max-width: 40px;" src="./icons8-delete-shield.gif">
+                                                    <img class="ml-2 mr-2" style="cursor: pointer; max-width: 30px;" src="./reply.png">
+                                                    <img class="mr-2" style="cursor: pointer; max-width: 40px;" src="./block.png">
                                             </div>
                                         </div>
                                     </li>
@@ -232,18 +232,18 @@
                                         <img style="max-width: 100px;" src="./5k (3).JPG">
                                     </div>
                                     <div class="flex mt-2">
-                                        <img style="cursor: pointer; max-width: 30px;" src="./icons8-delete-shield.gif">
+                                        <img style="cursor: pointer;" class="w-5 h-5 m-auto" src="./block.png">
                                         <p class="m-auto">Bann User</p>
                                     </div>
                                 </div>
 
                                 <div id="thread_6" class="mt-20">
                                     <div onclick="reply_thread()" class="flex cursor-pointer">
-                                        <img style="cursor: pointer; max-width: 30px;" src="./icons8-reply-arrow.gif">
+                                        <img style="cursor: pointer; max-width: 30px;" src="./reply.png">
                                         <p class="m-auto">Reply</p>
                                     </div>
                                     <div class="flex mt-1">
-                                        <img style="cursor: pointer; max-width: 30px;" src="./icons8-github.gif">
+                                        <img class="w-8 h-8" style="cursor: pointer;" src="./github.png">
                                         <p class="m-auto">Github</p>
                                     </div>
                                 </div>
@@ -263,19 +263,19 @@
                             
                             <div class="flex m-2">
                                 <div id="reply_l1" onclick="reply_thread()" class="flex mr-4 cursor-pointer">
-                                    <img style="cursor: pointer; max-width: 30px;" src="./icons8-reply-arrow.gif">
+                                    <img style="cursor: pointer;" src="./reply.png">
                                     <p class="pl-1 m-auto">Reply</p>
                                 </div>
                                 <div class="flex mr-4">
-                                    <img style="cursor: pointer; max-width: 30px;" src="./icons8-github.gif">
+                                    <img class="w-4 h-4 m-auto" style="cursor: pointer; max-width: 30px;" src="./github.png">
                                     <p class="pl-1 m-auto">Github</p>
                                 </div>
                                 <div id="like_l3" class="flex pr-4">
-                                    <img style="cursor: pointer; max-width: 60px;" src="./icons8-like.gif">
+                                    <img class="w-4 h-4 m-auto" style="cursor: pointer;" src="./like.png">
                                     <p class="m-auto pl-1">25 Likes</p>
                                 </div>
                                 <div class="flex">
-                                    <img style="cursor: pointer;" src="./icons8-share.gif">
+                                    <img class="w-4 h-4 m-auto" style="cursor: pointer;" src="./share.png">
                                     <p class="pl-1 m-auto">Share Post</p>
                                 </div>
                             </div>
